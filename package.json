@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.5.2",
+    "@supabase/supabase-js": "^2.47.10",
     "nequi": "link:/Users/marcomaza/www/personal/nequi",
     "next": "14.0.4",
     "react": "^18",
