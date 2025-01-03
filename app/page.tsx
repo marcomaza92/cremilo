@@ -8,7 +8,7 @@ const Home = async () => {
   console.log(data);
   console.log(error);
 
-  return <h1 className="test">Crémilo</h1>;
+  return <h1 className="color-base-turquoise">Crémilo</h1>;
 };
 
 export default Home;
