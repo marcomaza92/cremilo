@@ -1,14 +1,11 @@
-import { createClient } from "@/utils/supabase/server";
 import styles from "./page.module.css";
 
 const Home = async () => {
-  const supabase = await createClient();
-  const { data, error } = await supabase.from("transactions").select();
-
-  console.log(data);
-  console.log(error);
-
-  return <h1 className="color-base-turquoise">Crémilo</h1>;
+  return (
+    <section className="below-fold background-tint-yellow-tint-5">
+      <h1 className="color-base-turquoise">Crémilo</h1>
+    </section>
+  );
 };
 
 export default Home;
