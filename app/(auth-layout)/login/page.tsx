@@ -4,12 +4,12 @@ import { login } from "./actions";
 
 const Login = async () => {
   return (
-    <form>
+    <form action={login}>
       <label htmlFor="email">Email:</label>
       <input id="email" name="email" type="email" required />
       <label htmlFor="password">Password:</label>
       <input id="password" name="password" type="password" required />
-      <button formAction={login}>Log in</button>
+      <button type="submit">Log in</button>
     </form>
   );
 };

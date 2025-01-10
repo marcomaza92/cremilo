@@ -15,6 +15,32 @@ const Dashboard = async () => {
       <p>Registered email: {data.user.email}</p>
 
       <h2 className="color-base-purple">Dashboard</h2>
+      <form action="createOperation">
+        <label htmlFor="amount">
+          <span>Amount</span>
+          <input name="amount" id="amount" type="number" />
+        </label>
+        <label htmlFor="description">
+          <span>Description</span>
+          <input name="description" id="description" type="text" />
+        </label>
+        <label htmlFor="category">
+          <span>Category</span>
+          <select name="category" id="category">
+            <option selected value="Choose a category"></option>
+            <option value="comida">Comida</option>
+            <option value="transporte">Transporte</option>
+          </select>
+        </label>
+        <label htmlFor="paymentMethod">
+          <span>Payment Method</span>
+          <select name="paymentMethod" id="paymentMethod">
+            <option selected value="Choose a category"></option>
+            <option value="tarjeta6305">Tarjeta 6305</option>
+            <option value="efectivo">Efectivo</option>
+          </select>
+        </label>
+      </form>
     </div>
   );
 };

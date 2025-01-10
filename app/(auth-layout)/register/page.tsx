@@ -10,12 +10,12 @@ const Register = async () => {
   console.log(error);
 
   return (
-    <form>
+    <form action={register}>
       <label htmlFor="email">Email:</label>
       <input id="email" name="email" type="email" required />
       <label htmlFor="password">Password:</label>
       <input id="password" name="password" type="password" required />
-      <button formAction={register}>Create User</button>
+      <button type="submit">Create User</button>
     </form>
   );
 };
