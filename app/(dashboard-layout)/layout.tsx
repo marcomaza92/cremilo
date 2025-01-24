@@ -13,6 +13,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             <li>
               <Link href={"/"}>Debts</Link>
             </li>
+            <li>
+              <Link href={"/"}>Credit Cards</Link>
+            </li>
           </ul>
         </nav>
       </header>
