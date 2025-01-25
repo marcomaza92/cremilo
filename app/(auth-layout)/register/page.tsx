@@ -10,13 +10,18 @@ const Register = async () => {
   console.log(error);
 
   return (
-    <form action={register}>
-      <label htmlFor="email">Email:</label>
-      <input id="email" name="email" type="email" required />
-      <label htmlFor="password">Password:</label>
-      <input id="password" name="password" type="password" required />
-      <button type="submit">Create User</button>
-    </form>
+    <section>
+      <form action={register}>
+        <label htmlFor="email">Email:</label>
+        <input id="email" name="email" type="email" required />
+        <label htmlFor="password">Password:</label>
+        <input id="password" name="password" type="password" required />
+        <button type="submit">Create User</button>
+      </form>
+      <div className="">
+        <h3>oAuth Options for Registration</h3>
+      </div>
+    </section>
   );
 };
 
