@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import styles from "./page.module.css";
+import { logout } from "./actions";
 
 const Dashboard = async () => {
   const supabase = await createClient();
@@ -11,8 +12,12 @@ const Dashboard = async () => {
   }
   return (
     <div>
+      {/* TODO: Change to correct schema to fetch information */}
       <h1 className="color-base-turquoise">Hello {data.user.role}</h1>
       <p>Registered email: {data.user.email}</p>
+      <form action={logout}>
+        <button type="submit">Log out</button>
+      </form>
 
       <h2 className="color-base-purple">Dashboard</h2>
       <form action="createOperation">

@@ -17,6 +17,7 @@ export async function login(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword(data);
 
   if (error) {
+    // TODO: Add toast message with error instead of redirecting
     redirect("/login");
   }
 
