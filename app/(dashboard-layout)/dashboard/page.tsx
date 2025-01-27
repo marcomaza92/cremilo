@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import styles from "./page.module.css";
-import { logout } from "./actions";
+import { createOperation, logout } from "./actions";
 
 const Dashboard = async () => {
   const supabase = await createClient();
@@ -20,7 +20,7 @@ const Dashboard = async () => {
       </form>
 
       <h2 className="color-base-purple">Dashboard</h2>
-      <form action="createOperation">
+      <form action={createOperation}>
         <label htmlFor="amount">
           <span>Amount</span>
           <input name="amount" id="amount" type="number" />
