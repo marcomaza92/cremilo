@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import styles from "./page.module.css";
 import { updateProfile } from "./actions";
+import type { UserData } from "@/types/user";
 
 const Profile = async () => {
   const supabase = await createClient();
@@ -10,6 +11,15 @@ const Profile = async () => {
   if (error || !data?.user) {
     redirect("/login");
   }
+
+  const usersData = await supabase.from("users").select();
+
+  console.log(usersData.data);
+
+  const user: UserData = {
+    firstName: "lalala",
+  };
+
   return (
     <div>
       {/* TODO: Add auth conditional so it won't render when it's not logged in */}
@@ -17,7 +27,12 @@ const Profile = async () => {
       <form action={updateProfile}>
         <label htmlFor="firstName">
           <span>First Name</span>
-          <input name="firstName" id="firstName" type="text" />
+          <input
+            defaultValue={user.firstName}
+            name="firstName"
+            id="firstName"
+            type="text"
+          />
         </label>
         <label htmlFor="lastName">
           <span>Last Name</span>
