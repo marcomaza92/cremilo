@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import styles from "./page.module.css";
 import { updateProfile } from "./actions";
-import type { UserData } from "@/types/user";
+import type { UserData, UserInfo } from "@/types/user";
 
 const Profile = async () => {
   const supabase = await createClient();
@@ -12,13 +12,12 @@ const Profile = async () => {
     redirect("/login");
   }
 
-  const usersData = await supabase.from("users").select();
+  const { data: userInfo }: UserData = await supabase
+    .from("users")
+    .select()
+    .eq("id", data.user.id);
 
-  console.log(usersData.data);
-
-  const user: UserData = {
-    firstName: "lalala",
-  };
+  const [currentUser] = userInfo ?? [];
 
   return (
     <div>
@@ -28,7 +27,7 @@ const Profile = async () => {
         <label htmlFor="firstName">
           <span>First Name</span>
           <input
-            defaultValue={user.firstName}
+            defaultValue={currentUser.first_name}
             name="firstName"
             id="firstName"
             type="text"
@@ -36,24 +35,44 @@ const Profile = async () => {
         </label>
         <label htmlFor="lastName">
           <span>Last Name</span>
-          <input name="lastName" id="lastName" type="text" />
+          <input
+            defaultValue={currentUser.last_name}
+            name="lastName"
+            id="lastName"
+            type="text"
+          />
         </label>
         <label htmlFor="birthday">
           <span>Birthday</span>
-          <input name="birthday" id="birthday" type="date" />
+          <input
+            defaultValue={currentUser.birthday}
+            name="birthday"
+            id="birthday"
+            type="date"
+          />
         </label>
         <label htmlFor="age">
           <span>Age</span>
-          <input name="age" id="age" type="number" />
+          <input
+            defaultValue={currentUser.age}
+            name="age"
+            id="age"
+            type="number"
+          />
         </label>
         <label htmlFor="address">
           <span>Address</span>
-          <input name="address" id="address" type="text" />
+          <input
+            defaultValue={currentUser.address}
+            name="address"
+            id="address"
+            type="text"
+          />
         </label>
         <label htmlFor="city">
           <span>City</span>
           <select name="city" id="city">
-            <option selected value="Choose a city"></option>
+            <option defaultValue="Choose a city"></option>
             <option value="cordoba">Córdoba</option>
             <option value="rioNegro">Rio Negro</option>
           </select>
@@ -61,7 +80,7 @@ const Profile = async () => {
         <label htmlFor="country">
           <span>Country</span>
           <select name="country" id="country">
-            <option selected value="Choose a country"></option>
+            <option defaultValue="Choose a country"></option>
             <option value="argentina">Argentina</option>
             <option value="estadosUnidos">Estados Unidos</option>
           </select>
@@ -69,9 +88,9 @@ const Profile = async () => {
         <label htmlFor="role">
           <span>Role</span>
           <select name="role" id="role">
-            <option selected value="Choose a role"></option>
-            <option value="admin">Admin</option>
-            <option value="user">User</option>
+            <option defaultValue={currentUser.role}>{currentUser.role}</option>
+            <option value={0}>Admin</option>
+            <option value={1}>User</option>
           </select>
         </label>
       </form>

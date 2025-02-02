@@ -32,7 +32,7 @@ const Dashboard = async () => {
         <label htmlFor="category">
           <span>Category</span>
           <select name="category" id="category">
-            <option selected value="Choose a category"></option>
+            <option defaultValue="Choose a category"></option>
             <option value="comida">Comida</option>
             <option value="transporte">Transporte</option>
           </select>
@@ -40,7 +40,7 @@ const Dashboard = async () => {
         <label htmlFor="paymentMethod">
           <span>Payment Method</span>
           <select name="paymentMethod" id="paymentMethod">
-            <option selected value="Choose a category"></option>
+            <option defaultValue="Choose a category"></option>
             <option value="tarjeta6305">Tarjeta 6305</option>
             <option value="efectivo">Efectivo</option>
           </select>
