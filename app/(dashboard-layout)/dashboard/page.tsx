@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import styles from "./page.module.css";
 import { createOperation, logout } from "./actions";
+import { UserData } from "@/types/user";
 
 const Dashboard = async () => {
   const supabase = await createClient();
@@ -10,10 +11,18 @@ const Dashboard = async () => {
   if (error || !data?.user) {
     redirect("/login");
   }
+
+  const { data: userInfo }: UserData = await supabase
+    .from("users")
+    .select()
+    .eq("id", data.user.id);
+
+  const [currentUser] = userInfo ?? [];
+
   return (
     <div>
       {/* TODO: Change to correct schema to fetch information */}
-      <h1 className="color-base-turquoise">Hello {data.user.role}</h1>
+      <h1 className="color-base-turquoise">Hello {currentUser.first_name}</h1>
       <p>Registered email: {data.user.email}</p>
       <form action={logout}>
         <button type="submit">Log out</button>
