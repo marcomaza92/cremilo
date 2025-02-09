@@ -2,23 +2,25 @@ import Link from "next/link";
 import styles from "./layout.module.css";
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
+  const navUrls = [
+    { href: "/", label: "Homepage" },
+    { href: "/about", label: "About" },
+    { href: "/login", label: "Login" },
+    { href: "/register", label: "Register" },
+  ];
+
   return (
     <>
       <header>
         <nav>
           <ul>
-            <li>
-              <Link href={"/"}>Homepage</Link>
-            </li>
-            <li>
-              <Link href={"/about"}>About</Link>
-            </li>
-            <li>
-              <Link href={"/login"}>Login</Link>
-            </li>
-            <li>
-              <Link href={"/register"}>Register</Link>
-            </li>
+            {navUrls.map(({ href, label }) => (
+              <li key={href}>
+                <Link className="color-base-green" href={href}>
+                  {label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </nav>
       </header>
