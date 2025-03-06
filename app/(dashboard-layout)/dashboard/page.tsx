@@ -21,7 +21,6 @@ const Dashboard = async () => {
 
   return (
     <div>
-      {/* TODO: Change to correct schema to fetch information */}
       <h1 className="color-base-turquoise">Hello {currentUser.first_name}</h1>
       <p>Registered email: {data.user.email}</p>
       <form action={logout}>
@@ -51,6 +50,7 @@ const Dashboard = async () => {
           <select name="paymentMethod" id="paymentMethod">
             <option defaultValue="Choose a category"></option>
             <option value="tarjeta6305">Tarjeta 6305</option>
+            <option value="tarjeta8137">Tarjeta 6305</option>
             <option value="efectivo">Efectivo</option>
           </select>
         </label>
