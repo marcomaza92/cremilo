@@ -43,6 +43,13 @@ const Dashboard = async () => {
             <option defaultValue="Choose a category"></option>
             <option value="comida">Comida</option>
             <option value="transporte">Transporte</option>
+            <option value="recreacion">Recreación</option>
+            <option value="isis">Isis</option>
+            <option value="salidas">Salidas</option>
+            <option value="delivery">Delivery</option>
+            <option value="salud">Salud</option>
+            <option value="servicios">Servicios</option>
+            <option value="tarjetas">Tarjetas</option>
           </select>
         </label>
         <label htmlFor="paymentMethod">
