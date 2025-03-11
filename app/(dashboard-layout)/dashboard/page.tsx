@@ -57,8 +57,10 @@ const Dashboard = async () => {
           <select name="paymentMethod" id="paymentMethod">
             <option defaultValue="Choose a category"></option>
             <option value="tarjeta6305">Tarjeta 6305</option>
-            <option value="tarjeta8137">Tarjeta 6305</option>
+            <option value="tarjeta8137">Tarjeta 8137</option>
             <option value="efectivo">Efectivo</option>
+            <option value="efectivo">Debito</option>
+            <option value="efectivo">Transferencia</option>
           </select>
         </label>
       </form>
