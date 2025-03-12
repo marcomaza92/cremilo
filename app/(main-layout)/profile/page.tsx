@@ -74,6 +74,7 @@ const Profile = async () => {
           <select name="city" id="city">
             <option defaultValue="Choose a city"></option>
             <option value="cordoba">Córdoba</option>
+            <option value="buenosAires">Buenos Aires</option>
             <option value="rioNegro">Rio Negro</option>
           </select>
         </label>
@@ -82,6 +83,8 @@ const Profile = async () => {
           <select name="country" id="country">
             <option defaultValue="Choose a country"></option>
             <option value="argentina">Argentina</option>
+            <option value="mexico">Mexico</option>
+            <option value="espana">España</option>
             <option value="estadosUnidos">Estados Unidos</option>
           </select>
         </label>
