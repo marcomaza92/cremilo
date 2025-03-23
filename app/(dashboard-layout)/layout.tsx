@@ -1,5 +1,6 @@
 import Link from "next/link";
 import styles from "./layout.module.css";
+import { DASHBOARD_URLS } from "@/utils/constants/data";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -7,15 +8,13 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       <header>
         <nav>
           <ul>
-            <li>
-              <Link href={"/"}>Overview</Link>
-            </li>
-            <li>
-              <Link href={"/"}>Debts</Link>
-            </li>
-            <li>
-              <Link href={"/"}>Credit Cards</Link>
-            </li>
+            {DASHBOARD_URLS.map(({ href, label }) => (
+              <li key={href}>
+                <Link className="color-base-green" href={href}>
+                  {label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </nav>
       </header>
