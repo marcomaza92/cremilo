@@ -1,20 +1,14 @@
 import Link from "next/link";
 import styles from "./layout.module.css";
+import { NAVIGATION_URLS } from "@/utils/constants/data";
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
-  const navUrls = [
-    { href: "/", label: "Homepage" },
-    { href: "/about", label: "About" },
-    { href: "/login", label: "Login" },
-    { href: "/register", label: "Register" },
-  ];
-
   return (
     <>
       <header>
         <nav>
           <ul>
-            {navUrls.map(({ href, label }) => (
+            {NAVIGATION_URLS.map(({ href, label }) => (
               <li key={href}>
                 <Link className="color-base-green" href={href}>
                   {label}
