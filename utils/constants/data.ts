@@ -10,3 +10,5 @@ export const DASHBOARD_URLS = [
   { href: "/", label: "Debts" },
   { href: "/", label: "Credit Cards" },
 ];
+
+export const AUTH_URLS = [{ href: "/", label: "Homepage" }];

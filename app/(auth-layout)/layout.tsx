@@ -1,5 +1,6 @@
 import Link from "next/link";
 import styles from "./layout.module.css";
+import { AUTH_URLS } from "@/utils/constants/data";
 
 const AuthLayout = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -7,9 +8,13 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
       <header>
         <nav>
           <ul>
-            <li>
-              <Link href={"/"}>Homepage</Link>
-            </li>
+            {AUTH_URLS.map(({ href, label }) => (
+              <li key={href}>
+                <Link className="color-base-green" href={href}>
+                  {label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </nav>
       </header>
