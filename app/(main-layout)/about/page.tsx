@@ -4,7 +4,7 @@ const About = async () => {
   return (
     <section>
       <h1 className="color-base-turquoise">About</h1>
-      <h2>Money Orchestrator</h2>
+      <h2>Your best Money Orchestrator</h2>
       <p>Made with love by Marco Maza</p>
     </section>
   );
