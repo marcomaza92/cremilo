@@ -50,6 +50,8 @@ const Dashboard = async () => {
             <option value="salud">Salud</option>
             <option value="servicios">Servicios</option>
             <option value="tarjetas">Tarjetas</option>
+            <option value="mascotas">Mascotas</option>
+            <option value="bazar">Bazar</option>
           </select>
         </label>
         <label htmlFor="paymentMethod">
