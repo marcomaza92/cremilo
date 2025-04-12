@@ -80,6 +80,7 @@ const Profile = async () => {
             <option value="salta">Salta</option>
             <option value="tierraDelFuego">Tierra Del Fuego</option>
             <option value="mendoza">Mendoza</option>
+            <option value="jujuy">Jujuy</option>
           </select>
         </label>
         <label htmlFor="country">
