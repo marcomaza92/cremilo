@@ -75,6 +75,7 @@ const Profile = async () => {
             <option defaultValue="Choose a city"></option>
             <option value="cordoba">Córdoba</option>
             <option value="buenosAires">Buenos Aires</option>
+            <option value="tucuman">Tucuman</option>
             <option value="rioNegro">Rio Negro</option>
             <option value="chubut">Chubut</option>
             <option value="salta">Salta</option>
