@@ -91,6 +91,7 @@ const Profile = async () => {
             <option defaultValue="Choose a country"></option>
             <option value="argentina">Argentina</option>
             <option value="mexico">Mexico</option>
+            <option value="mexico">Colombia</option>
             <option value="espana">España</option>
             <option value="estadosUnidos">Estados Unidos</option>
             <option value="holanda">Holanda</option>
