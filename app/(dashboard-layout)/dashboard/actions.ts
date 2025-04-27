@@ -4,9 +4,7 @@ import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-export async function createOperation(formData: FormData) {
-  console.log(formData);
-}
+export async function createOperation(formData: FormData) {}
 
 export async function logout() {
   const supabase = await createClient();

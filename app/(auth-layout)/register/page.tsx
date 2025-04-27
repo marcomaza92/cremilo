@@ -6,9 +6,6 @@ const Register = async () => {
   const supabase = await createClient();
   const { data, error } = await supabase.from("operations").select();
 
-  console.log(data);
-  console.log(error);
-
   return (
     <section>
       <form action={register}>
