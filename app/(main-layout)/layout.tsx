@@ -19,7 +19,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
         </nav>
       </header>
       <main>{children}</main>
-      <footer className="background-base-blue">This is the main footer</footer>
+      <footer className="background-base-green">This is the main footer</footer>
     </>
   );
 };

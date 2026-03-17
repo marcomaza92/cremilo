@@ -2,7 +2,19 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import styles from "./page.module.css";
 import { createOperation, logout } from "./actions";
-import { UserData } from "@/types/user";
+import { UserData, UserInfo } from "@/types/user";
+
+const initialUser: UserInfo = {
+  id: "",
+  first_name: "Franco",
+  last_name: "Milazzo",
+  birthday: "24-07-1990",
+  age: 18,
+  address: "Fake St. 123",
+  city: "Salta",
+  country: "Argentina",
+  role: 0,
+};
 
 const Dashboard = async () => {
   const supabase = await createClient();
@@ -17,11 +29,33 @@ const Dashboard = async () => {
     .select()
     .eq("id", data.user.id);
 
-  const [currentUser] = userInfo ?? [];
+  const currentUser = { ...initialUser };
+
+  if (userInfo && userInfo[0]) {
+    Object.keys(initialUser).forEach((key) => {
+      const typedKey = key as keyof UserInfo;
+      if (
+        userInfo[0][typedKey] !== undefined ||
+        userInfo[0][typedKey] !== null
+      ) {
+        (currentUser as any)[typedKey] = userInfo[0][typedKey];
+      } else {
+        (currentUser as any)[typedKey] = (initialUser as any)[typedKey];
+        console.log(
+          `Key ${typedKey} is missing in userInfo, setting default value.`,
+          (initialUser as any)[typedKey],
+        );
+      }
+    });
+  }
+
+  console.log(currentUser);
 
   return (
     <div>
-      <h1 className="color-base-turquoise">Hello {currentUser.first_name}</h1>
+      <h1 className="color-base-turquoise">
+        Hello {currentUser.first_name} {currentUser.last_name}
+      </h1>
       <p>Registered email: {data.user.email}</p>
       <form action={logout}>
         <button type="submit">Log out</button>

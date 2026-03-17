@@ -7,8 +7,8 @@ export const NAVIGATION_URLS = [
 
 export const DASHBOARD_URLS = [
   { href: "/", label: "Overview" },
-  { href: "/", label: "Debts" },
-  { href: "/", label: "Credit Cards" },
+  { href: "/debts", label: "Debts" },
+  { href: "/credit-cards", label: "Credit Cards" },
 ];
 
 export const AUTH_URLS = [{ href: "/", label: "Homepage" }];
