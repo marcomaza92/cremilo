@@ -1,0 +1,1183 @@
+=== Sheet: Calculator ===
+A1 [value]: Calculator
+B1 [value]: VRP = Valor Real Pagado
+D1 [value]: VCP = Valor Convertido Pagado
+J1 [value]: Item
+K1 [value]: Currency
+L1 [value]: Febrero
+N1 [value]: Marzo
+P1 [value]: Abril
+R1 [value]: Mayo
+T1 [value]: Junio
+V1 [value]: Julio
+B2 [value]: Cambio
+C2 [value]: Dolar Tarjeta
+D2 [value]: 1905
+C4 [formula]: =(C12-C71)
+D4 [value]: Balance
+L4 [value]: Balance
+M4 [formula]: =(M12-M71)
+O4 [formula]: =(O12-O71)
+Q4 [formula]: =(Q12-Q71)
+S4 [formula]: =(S12-S71)
+U4 [formula]: =(U12-U71)
+W4 [formula]: =(W12-W71)
+B5 [value]: VRP
+C5 [value]: VCP
+F5 [value]: Pagado?
+G5 [value]: Medio de Pago
+L5 [value]: VRP
+M5 [value]: VCP
+N5 [value]: VRP
+O5 [value]: VCP
+P5 [value]: VRP
+Q5 [value]: VCP
+R5 [value]: VRP
+S5 [value]: VCP
+T5 [value]: VRP
+U5 [value]: VCP
+V5 [value]: VRP
+W5 [value]: VCP
+A6 [value]: Ingresos
+B6 [value]: 0
+C6 [formula]: =IF(D6 = "USD"; B6 * $D$2; B6)
+D6 [value]: ARS
+E6 [value]: Bancor
+F6 [value]: Si
+G6 [value]: Transferencia
+I6 [value]: Ingresos
+J6 [value]: Bancor
+K6 [value]: ARS
+L6 [value]: 1440000
+M6 [formula]: =IF($K6 = "USD"; L6 * $D$2; L6)
+N6 [value]: 3600000
+O6 [formula]: =IF($K6 = "USD"; N6 * $D$2; N6)
+P6 [value]: 3600000
+Q6 [formula]: =IF($K6 = "USD"; P6 * $D$2; P6)
+R6 [value]: 3600000
+S6 [formula]: =IF($K6 = "USD"; R6 * $D$2; R6)
+T6 [value]: 3600000
+U6 [formula]: =IF($K6 = "USD"; T6 * $D$2; T6)
+V6 [value]: 3600000
+W6 [formula]: =IF($K6 = "USD"; V6 * $D$2; V6)
+B7 [value]: 160000
+C7 [formula]: =IF(D7 = "USD"; B7 * $D$2; B7)
+D7 [value]: ARS
+E7 [value]: Hipper Studio
+F7 [value]: No
+G7 [value]: Transferencia
+J7 [value]: Hipper Studio
+K7 [value]: ARS
+L7 [value]: 55000
+M7 [formula]: =IF($K7 = "USD"; L7 * $D$2; L7)
+N7 [value]: 0
+O7 [formula]: =IF($K7 = "USD"; N7 * $D$2; N7)
+P7 [value]: 0
+Q7 [formula]: =IF($K7 = "USD"; P7 * $D$2; P7)
+R7 [value]: 180000
+S7 [formula]: =IF($K7 = "USD"; R7 * $D$2; R7)
+T7 [value]: 95000
+U7 [formula]: =IF($K7 = "USD"; T7 * $D$2; T7)
+V7 [value]: 0
+W7 [formula]: =IF($K7 = "USD"; V7 * $D$2; V7)
+B8 [value]: 0
+C8 [formula]: =IF(D8 = "USD"; B8 * $D$2; B8)
+D8 [value]: ARS
+E8 [value]: Yorokobu
+F8 [value]: Si
+G8 [value]: Transferencia
+J8 [value]: Yorokobu
+K8 [value]: ARS
+L8 [value]: 0
+M8 [formula]: =IF($K8 = "USD"; L8 * $D$2; L8)
+N8 [value]: 0
+O8 [formula]: =IF($K8 = "USD"; N8 * $D$2; N8)
+P8 [value]: 0
+Q8 [formula]: =IF($K8 = "USD"; P8 * $D$2; P8)
+R8 [value]: 0
+S8 [formula]: =IF($K8 = "USD"; R8 * $D$2; R8)
+T8 [value]: 0
+U8 [formula]: =IF($K8 = "USD"; T8 * $D$2; T8)
+V8 [value]: 0
+W8 [formula]: =IF($K8 = "USD"; V8 * $D$2; V8)
+B9 [value]: 127764
+C9 [formula]: =IF(D9 = "USD"; B9 * $D$2; B9)
+D9 [value]: ARS
+E9 [value]: Liquidez
+F9 [value]: Si
+G9 [value]: N/A
+J9 [value]: Liquidez
+K9 [value]: ARS
+L9 [value]: 203675
+M9 [formula]: =IF($K9 = "USD"; L9 * $D$2; L9)
+N9 [value]: 0
+O9 [formula]: =IF($K9 = "USD"; N9 * $D$2; N9)
+P9 [value]: 0
+Q9 [formula]: =IF($K9 = "USD"; P9 * $D$2; P9)
+R9 [value]: 0
+S9 [formula]: =IF($K9 = "USD"; R9 * $D$2; R9)
+T9 [value]: 0
+U9 [formula]: =IF($K9 = "USD"; T9 * $D$2; T9)
+V9 [value]: 0
+W9 [formula]: =IF($K9 = "USD"; V9 * $D$2; V9)
+B10 [value]: 0
+C10 [formula]: =IF(D10 = "USD"; B10 * $D$2; B10)
+D10 [value]: ARS
+E10 [value]: Fondos
+F10 [value]: Si
+G10 [value]: N/A
+J10 [value]: Fondos
+K10 [value]: ARS
+L10 [value]: 1007080.28
+M10 [formula]: =IF($K10 = "USD"; L10 * $D$2; L10)
+N10 [value]: 0
+O10 [formula]: =IF($K10 = "USD"; N10 * $D$2; N10)
+P10 [value]: 0
+Q10 [formula]: =IF($K10 = "USD"; P10 * $D$2; P10)
+R10 [value]: 0
+S10 [formula]: =IF($K10 = "USD"; R10 * $D$2; R10)
+T10 [value]: 0
+U10 [formula]: =IF($K10 = "USD"; T10 * $D$2; T10)
+V10 [value]: 0
+W10 [formula]: =IF($K10 = "USD"; V10 * $D$2; V10)
+B11 [value]: 0
+C11 [formula]: =IF(D11 = "USD"; B11 * $D$2; B11)
+D11 [value]: ARS
+E11 [value]: Extraordinarios
+F11 [value]: Si
+G11 [value]: Transferencia
+J11 [value]: Extraordinarios
+K11 [value]: ARS
+L11 [value]: 984000
+M11 [formula]: =IF($K11 = "USD"; L11 * $D$2; L11)
+N11 [value]: 0
+O11 [formula]: =IF($K11 = "USD"; N11 * $D$2; N11)
+P11 [value]: 0
+Q11 [formula]: =IF($K11 = "USD"; P11 * $D$2; P11)
+R11 [value]: 0
+S11 [formula]: =IF($K11 = "USD"; R11 * $D$2; R11)
+T11 [value]: 0
+U11 [formula]: =IF($K11 = "USD"; T11 * $D$2; T11)
+V11 [value]: 0
+W11 [formula]: =IF($K11 = "USD"; V11 * $D$2; V11)
+C12 [formula]: =SUMIF(F6:F11; "Si"; C6:C11)
+D12 [value]: Subtotal
+L12 [value]: Subtotal
+M12 [formula]: =SUM(M6:M11)
+O12 [formula]: =SUM(O6:O11)
+Q12 [formula]: =SUM(Q6:Q11)
+S12 [formula]: =SUM(S6:S11)
+U12 [formula]: =SUM(U6:U11)
+W12 [formula]: =SUM(W6:W11)
+A14 [value]: Gastos Fijos
+B14 [value]: 876957
+C14 [formula]: =IF(D14 = "USD"; B14 * $D$2; B14)
+D14 [value]: ARS
+E14 [value]: Alquiler
+F14 [value]: Si
+G14 [value]: Transferencia
+I14 [value]: Gastos Fijos
+J14 [value]: Alquiler
+K14 [value]: ARS
+L14 [value]: 876957
+M14 [formula]: =IF($K14 = "USD"; L14 * $D$2; L14)
+N14 [value]: 876957
+O14 [formula]: =IF($K14 = "USD"; N14 * $D$2; N14)
+P14 [value]: 876957
+Q14 [formula]: =IF($K14 = "USD"; P14 * $D$2; P14)
+R14 [value]: 876957
+S14 [formula]: =IF($K14 = "USD"; R14 * $D$2; R14)
+T14 [value]: 960000
+U14 [formula]: =IF($K14 = "USD"; T14 * $D$2; T14)
+V14 [value]: 960000
+W14 [formula]: =IF($K14 = "USD"; V14 * $D$2; V14)
+B15 [value]: 0
+C15 [formula]: =IF(D15 = "USD"; B15 * $D$2; B15)
+D15 [value]: ARS
+E15 [value]: Municipalidad
+F15 [value]: Si
+G15 [value]: Transferencia
+J15 [value]: Municipalidad
+K15 [value]: ARS
+L15 [value]: 0
+M15 [formula]: =IF($K15 = "USD"; L15 * $D$2; L15)
+N15 [value]: 0
+O15 [formula]: =IF($K15 = "USD"; N15 * $D$2; N15)
+P15 [value]: 0
+Q15 [formula]: =IF($K15 = "USD"; P15 * $D$2; P15)
+R15 [value]: 0
+S15 [formula]: =IF($K15 = "USD"; R15 * $D$2; R15)
+T15 [value]: 0
+U15 [formula]: =IF($K15 = "USD"; T15 * $D$2; T15)
+V15 [value]: 0
+W15 [formula]: =IF($K15 = "USD"; V15 * $D$2; V15)
+B16 [value]: 24878.57
+C16 [formula]: =IF(D16 = "USD"; B16 * $D$2; B16)
+D16 [value]: ARS
+E16 [value]: Agua
+F16 [value]: Si
+G16 [value]: Transferencia
+J16 [value]: Agua
+K16 [value]: ARS
+L16 [value]: 24878.57
+M16 [formula]: =IF($K16 = "USD"; L16 * $D$2; L16)
+N16 [value]: 24878.57
+O16 [formula]: =IF($K16 = "USD"; N16 * $D$2; N16)
+P16 [value]: 24878.57
+Q16 [formula]: =IF($K16 = "USD"; P16 * $D$2; P16)
+R16 [value]: 24878.57
+S16 [formula]: =IF($K16 = "USD"; R16 * $D$2; R16)
+T16 [value]: 24878.57
+U16 [formula]: =IF($K16 = "USD"; T16 * $D$2; T16)
+V16 [value]: 24878.57
+W16 [formula]: =IF($K16 = "USD"; V16 * $D$2; V16)
+B17 [value]: 33205.78
+C17 [formula]: =IF(D17 = "USD"; B17 * $D$2; B17)
+D17 [value]: ARS
+E17 [value]: Gas
+F17 [value]: Si
+G17 [value]: Visa 7219
+J17 [value]: Gas
+K17 [value]: ARS
+L17 [value]: 23166.02
+M17 [formula]: =IF($K17 = "USD"; L17 * $D$2; L17)
+N17 [value]: 33205.78
+O17 [formula]: =IF($K17 = "USD"; N17 * $D$2; N17)
+P17 [value]: 23166.02
+Q17 [formula]: =IF($K17 = "USD"; P17 * $D$2; P17)
+R17 [value]: 23166.02
+S17 [formula]: =IF($K17 = "USD"; R17 * $D$2; R17)
+T17 [value]: 23166.02
+U17 [formula]: =IF($K17 = "USD"; T17 * $D$2; T17)
+V17 [value]: 23166.02
+W17 [formula]: =IF($K17 = "USD"; V17 * $D$2; V17)
+B18 [value]: 220606
+C18 [formula]: =IF(D18 = "USD"; B18 * $D$2; B18)
+D18 [value]: ARS
+E18 [value]: Luz
+F18 [value]: Si
+G18 [value]: Lemon 5233
+J18 [value]: Luz
+K18 [value]: ARS
+L18 [value]: 135932.9
+M18 [formula]: =IF($K18 = "USD"; L18 * $D$2; L18)
+N18 [value]: 220606
+O18 [formula]: =IF($K18 = "USD"; N18 * $D$2; N18)
+P18 [value]: 200100
+Q18 [formula]: =IF($K18 = "USD"; P18 * $D$2; P18)
+R18 [value]: 120000
+S18 [formula]: =IF($K18 = "USD"; R18 * $D$2; R18)
+T18 [value]: 70000
+U18 [formula]: =IF($K18 = "USD"; T18 * $D$2; T18)
+V18 [value]: 70000
+W18 [formula]: =IF($K18 = "USD"; V18 * $D$2; V18)
+B19 [value]: 68030.01
+C19 [formula]: =IF(D19 = "USD"; B19 * $D$2; B19)
+D19 [value]: ARS
+E19 [value]: Internet / Tele
+F19 [value]: Si
+G19 [value]: Visa 7219
+J19 [value]: Internet / Tele
+K19 [value]: ARS
+L19 [value]: 60030.01
+M19 [formula]: =IF($K19 = "USD"; L19 * $D$2; L19)
+N19 [value]: 68030.01
+O19 [formula]: =IF($K19 = "USD"; N19 * $D$2; N19)
+P19 [value]: 63030.01
+Q19 [formula]: =IF($K19 = "USD"; P19 * $D$2; P19)
+R19 [value]: 63030.01
+S19 [formula]: =IF($K19 = "USD"; R19 * $D$2; R19)
+T19 [value]: 63030.01
+U19 [formula]: =IF($K19 = "USD"; T19 * $D$2; T19)
+V19 [value]: 63030.01
+W19 [formula]: =IF($K19 = "USD"; V19 * $D$2; V19)
+B20 [value]: 34246.99
+C20 [formula]: =IF(D20 = "USD"; B20 * $D$2; B20)
+D20 [value]: ARS
+E20 [value]: Celular
+F20 [value]: Si
+G20 [value]: Visa 7219
+J20 [value]: Celular
+K20 [value]: ARS
+L20 [value]: 32246.99
+M20 [formula]: =IF($K20 = "USD"; L20 * $D$2; L20)
+N20 [value]: 34246.99
+O20 [formula]: =IF($K20 = "USD"; N20 * $D$2; N20)
+P20 [value]: 32246.99
+Q20 [formula]: =IF($K20 = "USD"; P20 * $D$2; P20)
+R20 [value]: 32246.99
+S20 [formula]: =IF($K20 = "USD"; R20 * $D$2; R20)
+T20 [value]: 32246.99
+U20 [formula]: =IF($K20 = "USD"; T20 * $D$2; T20)
+V20 [value]: 32246.99
+W20 [formula]: =IF($K20 = "USD"; V20 * $D$2; V20)
+B21 [value]: 353750
+C21 [formula]: =IF(D21 = "USD"; B21 * $D$2; B21)
+D21 [value]: ARS
+E21 [value]: Cuota Isis
+F21 [value]: Si
+G21 [value]: Transferencia
+J21 [value]: Cuota Isis
+K21 [value]: ARS
+L21 [value]: 362500
+M21 [formula]: =IF($K21 = "USD"; L21 * $D$2; L21)
+N21 [value]: 353750
+O21 [formula]: =IF($K21 = "USD"; N21 * $D$2; N21)
+P21 [value]: 362500
+Q21 [formula]: =IF($K21 = "USD"; P21 * $D$2; P21)
+R21 [value]: 362500
+S21 [formula]: =IF($K21 = "USD"; R21 * $D$2; R21)
+T21 [value]: 362500
+U21 [formula]: =IF($K21 = "USD"; T21 * $D$2; T21)
+V21 [value]: 362500
+W21 [formula]: =IF($K21 = "USD"; V21 * $D$2; V21)
+B22 [formula]: =81533,46
+C22 [formula]: =IF(D22 = "USD"; B22 * $D$2; B22)
+D22 [value]: ARS
+E22 [value]: Monotributo
+F22 [value]: Si
+G22 [value]: Transferencia
+J22 [value]: Monotributo
+K22 [value]: ARS
+L22 [value]: 0
+M22 [formula]: =IF($K22 = "USD"; L22 * $D$2; L22)
+N22 [formula]: =81533,46
+O22 [formula]: =IF($K22 = "USD"; N22 * $D$2; N22)
+P22 [formula]: =85000+167000
+Q22 [formula]: =IF($K22 = "USD"; P22 * $D$2; P22)
+R22 [formula]: =167000+61000
+S22 [formula]: =IF($K22 = "USD"; R22 * $D$2; R22)
+T22 [formula]: =61000+61000
+U22 [formula]: =IF($K22 = "USD"; T22 * $D$2; T22)
+V22 [formula]: =61000+61000
+W22 [formula]: =IF($K22 = "USD"; V22 * $D$2; V22)
+B23 [value]: 18500
+C23 [formula]: =IF(D23 = "USD"; B23 * $D$2; B23)
+D23 [value]: ARS
+E23 [value]: Taller Dibujo Isis
+F23 [value]: Si
+G23 [value]: Transferencia
+J23 [value]: Taller Dibujo Isis
+K23 [value]: ARS
+L23 [value]: 10000
+M23 [formula]: =IF($K23 = "USD"; L23 * $D$2; L23)
+N23 [value]: 18500
+O23 [formula]: =IF($K23 = "USD"; N23 * $D$2; N23)
+P23 [value]: 18500
+Q23 [formula]: =IF($K23 = "USD"; P23 * $D$2; P23)
+R23 [value]: 18500
+S23 [formula]: =IF($K23 = "USD"; R23 * $D$2; R23)
+T23 [value]: 18500
+U23 [formula]: =IF($K23 = "USD"; T23 * $D$2; T23)
+V23 [value]: 18500
+W23 [formula]: =IF($K23 = "USD"; V23 * $D$2; V23)
+B24 [value]: 0
+C24 [formula]: =IF(D24 = "USD"; B24 * $D$2; B24)
+D24 [value]: ARS
+E24 [value]: Uber Isis
+F24 [value]: Si
+G24 [value]: Visa 7235
+J24 [value]: Uber Isis
+K24 [value]: ARS
+L24 [formula]: =7*16000
+M24 [formula]: =IF($K24 = "USD"; L24 * $D$2; L24)
+N24 [value]: 32000
+O24 [formula]: =IF($K24 = "USD"; N24 * $D$2; N24)
+P24 [formula]: =3*17000
+Q24 [formula]: =IF($K24 = "USD"; P24 * $D$2; P24)
+R24 [formula]: =3*16000
+S24 [formula]: =IF($K24 = "USD"; R24 * $D$2; R24)
+T24 [formula]: =3*16000
+U24 [formula]: =IF($K24 = "USD"; T24 * $D$2; T24)
+V24 [formula]: =3*16000
+W24 [formula]: =IF($K24 = "USD"; V24 * $D$2; V24)
+B25 [formula]: =4*1900
+C25 [formula]: =IF(D25 = "USD"; B25 * $D$2; B25)
+D25 [value]: ARS
+E25 [value]: Colectivo Isis
+F25 [value]: No
+G25 [value]: Transferencia
+J25 [value]: Colectivo Isis
+K25 [value]: ARS
+L25 [formula]: =4*1800
+M25 [formula]: =IF($K25 = "USD"; L25 * $D$2; L25)
+N25 [formula]: =12*1800
+O25 [formula]: =IF($K25 = "USD"; N25 * $D$2; N25)
+P25 [formula]: =12*1900
+Q25 [formula]: =IF($K25 = "USD"; P25 * $D$2; P25)
+R25 [formula]: =12*1800
+S25 [formula]: =IF($K25 = "USD"; R25 * $D$2; R25)
+T25 [formula]: =12*1800
+U25 [formula]: =IF($K25 = "USD"; T25 * $D$2; T25)
+V25 [formula]: =12*1800
+W25 [formula]: =IF($K25 = "USD"; V25 * $D$2; V25)
+B26 [formula]: =10*1900
+C26 [formula]: =IF(D26 = "USD"; B26 * $D$2; B26)
+D26 [value]: ARS
+E26 [value]: Colectivo Marco
+F26 [value]: No
+G26 [value]: Transferencia
+J26 [value]: Colectivo Marco
+K26 [value]: ARS
+L26 [formula]: =20*1800
+M26 [formula]: =IF($K26 = "USD"; L26 * $D$2; L26)
+N26 [formula]: =18*1800
+O26 [formula]: =IF($K26 = "USD"; N26 * $D$2; N26)
+P26 [formula]: =24*1900
+Q26 [formula]: =IF($K26 = "USD"; P26 * $D$2; P26)
+R26 [formula]: =24*1800
+S26 [formula]: =IF($K26 = "USD"; R26 * $D$2; R26)
+T26 [formula]: =24*1800
+U26 [formula]: =IF($K26 = "USD"; T26 * $D$2; T26)
+V26 [formula]: =24*1800
+W26 [formula]: =IF($K26 = "USD"; V26 * $D$2; V26)
+C27 [formula]: =IF(D27 = "USD"; B27 * $D$2; B27)
+M27 [formula]: =IF($K27 = "USD"; L27 * $D$2; L27)
+O27 [formula]: =IF($K27 = "USD"; N27 * $D$2; N27)
+Q27 [formula]: =IF($K27 = "USD"; P27 * $D$2; P27)
+S27 [formula]: =IF($K27 = "USD"; R27 * $D$2; R27)
+U27 [formula]: =IF($K27 = "USD"; T27 * $D$2; T27)
+W27 [formula]: =IF($K27 = "USD"; V27 * $D$2; V27)
+A28 [value]: Tarjetas
+B28 [value]: 399020
+C28 [formula]: =IF(D28 = "USD"; B28 * $D$2; B28)
+D28 [value]: ARS
+E28 [value]: Visa 7219
+F28 [value]: Si
+G28 [value]: Transferencia
+I28 [value]: Tarjetas
+J28 [value]: Visa 7219
+K28 [value]: ARS
+L28 [value]: 204130
+M28 [formula]: =IF($K28 = "USD"; L28 * $D$2; L28)
+N28 [value]: 399020
+O28 [formula]: =IF($K28 = "USD"; N28 * $D$2; N28)
+P28 [value]: 450000
+Q28 [formula]: =IF($K28 = "USD"; P28 * $D$2; P28)
+R28 [value]: 204130
+S28 [formula]: =IF($K28 = "USD"; R28 * $D$2; R28)
+T28 [value]: 204130
+U28 [formula]: =IF($K28 = "USD"; T28 * $D$2; T28)
+V28 [value]: 204130
+W28 [formula]: =IF($K28 = "USD"; V28 * $D$2; V28)
+B29 [value]: 0
+C29 [formula]: =IF(D29 = "USD"; B29 * $D$2; B29)
+D29 [value]: USD
+E29 [value]: Visa 7219
+F29 [value]: Si
+G29 [value]: Transferencia
+J29 [value]: Visa 7219
+K29 [value]: USD
+L29 [value]: 0
+M29 [formula]: =IF($K29 = "USD"; L29 * $D$2; L29)
+N29 [value]: 0
+O29 [formula]: =IF($K29 = "USD"; N29 * $D$2; N29)
+P29 [value]: 0
+Q29 [formula]: =IF($K29 = "USD"; P29 * $D$2; P29)
+R29 [value]: 0
+S29 [formula]: =IF($K29 = "USD"; R29 * $D$2; R29)
+T29 [value]: 0
+U29 [formula]: =IF($K29 = "USD"; T29 * $D$2; T29)
+V29 [value]: 0
+W29 [formula]: =IF($K29 = "USD"; V29 * $D$2; V29)
+B30 [value]: 267090
+C30 [formula]: =IF(D30 = "USD"; B30 * $D$2; B30)
+D30 [value]: ARS
+E30 [value]: Visa 7235
+F30 [value]: Si
+G30 [value]: Transferencia
+J30 [value]: Visa 7235
+K30 [value]: ARS
+L30 [value]: 168930
+M30 [formula]: =IF($K30 = "USD"; L30 * $D$2; L30)
+N30 [value]: 267090
+O30 [formula]: =IF($K30 = "USD"; N30 * $D$2; N30)
+P30 [value]: 350000
+Q30 [formula]: =IF($K30 = "USD"; P30 * $D$2; P30)
+R30 [value]: 168930
+S30 [formula]: =IF($K30 = "USD"; R30 * $D$2; R30)
+T30 [value]: 168930
+U30 [formula]: =IF($K30 = "USD"; T30 * $D$2; T30)
+V30 [value]: 168930
+W30 [formula]: =IF($K30 = "USD"; V30 * $D$2; V30)
+B31 [value]: 0
+C31 [formula]: =IF(D31 = "USD"; B31 * $D$2; B31)
+D31 [value]: USD
+E31 [value]: Visa 7235
+F31 [value]: Si
+G31 [value]: Transferencia
+J31 [value]: Visa 7235
+K31 [value]: USD
+L31 [value]: 0
+M31 [formula]: =IF($K31 = "USD"; L31 * $D$2; L31)
+N31 [value]: 0
+O31 [formula]: =IF($K31 = "USD"; N31 * $D$2; N31)
+P31 [value]: 35
+Q31 [formula]: =IF($K31 = "USD"; P31 * $D$2; P31)
+R31 [value]: 8.4
+S31 [formula]: =IF($K31 = "USD"; R31 * $D$2; R31)
+T31 [value]: 8.4
+U31 [formula]: =IF($K31 = "USD"; T31 * $D$2; T31)
+V31 [value]: 8.4
+W31 [formula]: =IF($K31 = "USD"; V31 * $D$2; V31)
+C32 [formula]: =IF(D32 = "USD"; B32 * $D$2; B32)
+M32 [formula]: =IF($K32 = "USD"; L32 * $D$2; L32)
+O32 [formula]: =IF($K32 = "USD"; N32 * $D$2; N32)
+Q32 [formula]: =IF($K32 = "USD"; P32 * $D$2; P32)
+S32 [formula]: =IF($K32 = "USD"; R32 * $D$2; R32)
+U32 [formula]: =IF($K32 = "USD"; T32 * $D$2; T32)
+W32 [formula]: =IF($K32 = "USD"; V32 * $D$2; V32)
+A33 [value]: Salud
+B33 [value]: 0
+C33 [formula]: =IF(D33 = "USD"; B33 * $D$2; B33)
+D33 [value]: ARS
+E33 [value]: Psicologo
+F33 [value]: Si
+G33 [value]: Transferencia
+I33 [value]: Salud
+J33 [value]: Psicologo
+K33 [value]: ARS
+L33 [value]: 0
+M33 [formula]: =IF($K33 = "USD"; L33 * $D$2; L33)
+N33 [value]: 0
+O33 [formula]: =IF($K33 = "USD"; N33 * $D$2; N33)
+P33 [value]: 0
+Q33 [formula]: =IF($K33 = "USD"; P33 * $D$2; P33)
+R33 [value]: 45000
+S33 [formula]: =IF($K33 = "USD"; R33 * $D$2; R33)
+T33 [value]: 45000
+U33 [formula]: =IF($K33 = "USD"; T33 * $D$2; T33)
+V33 [value]: 45000
+W33 [formula]: =IF($K33 = "USD"; V33 * $D$2; V33)
+B34 [value]: 0
+C34 [formula]: =IF(D34 = "USD"; B34 * $D$2; B34)
+D34 [value]: ARS
+E34 [value]: Natación
+F34 [value]: Si
+G34 [value]: TBD
+J34 [value]: Natación
+K34 [value]: ARS
+L34 [value]: 0
+M34 [formula]: =IF($K34 = "USD"; L34 * $D$2; L34)
+N34 [value]: 0
+O34 [formula]: =IF($K34 = "USD"; N34 * $D$2; N34)
+P34 [value]: 0
+Q34 [formula]: =IF($K34 = "USD"; P34 * $D$2; P34)
+R34 [value]: 0
+S34 [formula]: =IF($K34 = "USD"; R34 * $D$2; R34)
+T34 [value]: 0
+U34 [formula]: =IF($K34 = "USD"; T34 * $D$2; T34)
+V34 [value]: 0
+W34 [formula]: =IF($K34 = "USD"; V34 * $D$2; V34)
+B35 [value]: 0
+C35 [formula]: =IF(D35 = "USD"; B35 * $D$2; B35)
+D35 [value]: ARS
+E35 [value]: Obra Social
+F35 [value]: Si
+G35 [value]: TBD
+J35 [value]: Obra Social
+K35 [value]: ARS
+L35 [value]: 0
+M35 [formula]: =IF($K35 = "USD"; L35 * $D$2; L35)
+N35 [value]: 0
+O35 [formula]: =IF($K35 = "USD"; N35 * $D$2; N35)
+P35 [value]: 98000
+Q35 [formula]: =IF($K35 = "USD"; P35 * $D$2; P35)
+R35 [value]: 0
+S35 [formula]: =IF($K35 = "USD"; R35 * $D$2; R35)
+T35 [value]: 0
+U35 [formula]: =IF($K35 = "USD"; T35 * $D$2; T35)
+V35 [value]: 0
+W35 [formula]: =IF($K35 = "USD"; V35 * $D$2; V35)
+B36 [value]: 50000
+C36 [formula]: =IF(D36 = "USD"; B36 * $D$2; B36)
+D36 [value]: ARS
+E36 [value]: Odontología
+F36 [value]: Si
+G36 [value]: Transferencia
+J36 [value]: Odontología
+K36 [value]: ARS
+L36 [value]: 0
+M36 [formula]: =IF($K36 = "USD"; L36 * $D$2; L36)
+N36 [value]: 50000
+O36 [formula]: =IF($K36 = "USD"; N36 * $D$2; N36)
+P36 [value]: 0
+Q36 [formula]: =IF($K36 = "USD"; P36 * $D$2; P36)
+R36 [value]: 0
+S36 [formula]: =IF($K36 = "USD"; R36 * $D$2; R36)
+T36 [value]: 0
+U36 [formula]: =IF($K36 = "USD"; T36 * $D$2; T36)
+V36 [value]: 0
+W36 [formula]: =IF($K36 = "USD"; V36 * $D$2; V36)
+C37 [formula]: =IF(D37 = "USD"; B37 * $D$2; B37)
+M37 [formula]: =IF($K37 = "USD"; L37 * $D$2; L37)
+O37 [formula]: =IF($K37 = "USD"; N37 * $D$2; N37)
+Q37 [formula]: =IF($K37 = "USD"; P37 * $D$2; P37)
+S37 [formula]: =IF($K37 = "USD"; R37 * $D$2; R37)
+U37 [formula]: =IF($K37 = "USD"; T37 * $D$2; T37)
+W37 [formula]: =IF($K37 = "USD"; V37 * $D$2; V37)
+A38 [value]: Hipper Studio
+B38 [value]: 8.2
+C38 [formula]: =IF(D38 = "USD"; B38 * $D$2; B38)
+D38 [value]: USD
+E38 [value]: Mails Hipper
+F38 [value]: Si
+G38 [value]: Visa 7235
+I38 [value]: Hipper Studio
+J38 [value]: Mails Hipper
+K38 [value]: USD
+L38 [value]: 8.2
+M38 [formula]: =IF($K38 = "USD"; L38 * $D$2; L38)
+N38 [value]: 8.2
+O38 [formula]: =IF($K38 = "USD"; N38 * $D$2; N38)
+P38 [value]: 8.2
+Q38 [formula]: =IF($K38 = "USD"; P38 * $D$2; P38)
+R38 [value]: 8.2
+S38 [formula]: =IF($K38 = "USD"; R38 * $D$2; R38)
+T38 [value]: 8.2
+U38 [formula]: =IF($K38 = "USD"; T38 * $D$2; T38)
+V38 [value]: 8.2
+W38 [formula]: =IF($K38 = "USD"; V38 * $D$2; V38)
+B39 [value]: 20
+C39 [formula]: =IF(D39 = "USD"; B39 * $D$2; B39)
+D39 [value]: USD
+E39 [value]: Claude Code
+F39 [value]: Si
+G39 [value]: Lemon 5233
+J39 [value]: Claude Code
+K39 [value]: USD
+L39 [value]: 20
+M39 [formula]: =IF($K39 = "USD"; L39 * $D$2; L39)
+N39 [value]: 20
+O39 [formula]: =IF($K39 = "USD"; N39 * $D$2; N39)
+P39 [value]: 20
+Q39 [formula]: =IF($K39 = "USD"; P39 * $D$2; P39)
+R39 [value]: 20
+S39 [formula]: =IF($K39 = "USD"; R39 * $D$2; R39)
+T39 [value]: 20
+U39 [formula]: =IF($K39 = "USD"; T39 * $D$2; T39)
+V39 [value]: 20
+W39 [formula]: =IF($K39 = "USD"; V39 * $D$2; V39)
+B40 [value]: 0
+C40 [formula]: =IF(D40 = "USD"; B40 * $D$2; B40)
+D40 [value]: USD
+E40 [value]: Github Copilot
+F40 [value]: Si
+G40 [value]: Lemon 5233
+J40 [value]: Github Copilot
+K40 [value]: USD
+L40 [value]: 0
+M40 [formula]: =IF($K40 = "USD"; L40 * $D$2; L40)
+N40 [value]: 0
+O40 [formula]: =IF($K40 = "USD"; N40 * $D$2; N40)
+P40 [value]: 20
+Q40 [formula]: =IF($K40 = "USD"; P40 * $D$2; P40)
+R40 [value]: 20
+S40 [formula]: =IF($K40 = "USD"; R40 * $D$2; R40)
+T40 [value]: 20
+U40 [formula]: =IF($K40 = "USD"; T40 * $D$2; T40)
+V40 [value]: 20
+W40 [formula]: =IF($K40 = "USD"; V40 * $D$2; V40)
+C41 [formula]: =IF(D41 = "USD"; B41 * $D$2; B41)
+M41 [formula]: =IF($K41 = "USD"; L41 * $D$2; L41)
+O41 [formula]: =IF($K41 = "USD"; N41 * $D$2; N41)
+Q41 [formula]: =IF($K41 = "USD"; P41 * $D$2; P41)
+S41 [formula]: =IF($K41 = "USD"; R41 * $D$2; R41)
+U41 [formula]: =IF($K41 = "USD"; T41 * $D$2; T41)
+W41 [formula]: =IF($K41 = "USD"; V41 * $D$2; V41)
+A42 [value]: Recreación
+B42 [value]: 0
+C42 [formula]: =IF(D42 = "USD"; B42 * $D$2; B42)
+D42 [value]: ARS
+E42 [value]: Canto
+F42 [value]: Si
+G42 [value]: Transferencia
+I42 [value]: Recreación
+J42 [value]: Canto
+K42 [value]: ARS
+L42 [value]: 76000
+M42 [formula]: =IF($K42 = "USD"; L42 * $D$2; L42)
+N42 [value]: 0
+O42 [formula]: =IF($K42 = "USD"; N42 * $D$2; N42)
+P42 [value]: 112000
+Q42 [formula]: =IF($K42 = "USD"; P42 * $D$2; P42)
+R42 [value]: 62000
+S42 [formula]: =IF($K42 = "USD"; R42 * $D$2; R42)
+T42 [value]: 66000
+U42 [formula]: =IF($K42 = "USD"; T42 * $D$2; T42)
+V42 [value]: 70000
+W42 [formula]: =IF($K42 = "USD"; V42 * $D$2; V42)
+C43 [formula]: =IF(D43 = "USD"; B43 * $D$2; B43)
+M43 [formula]: =IF($K43 = "USD"; L43 * $D$2; L43)
+O43 [formula]: =IF($K43 = "USD"; N43 * $D$2; N43)
+Q43 [formula]: =IF($K43 = "USD"; P43 * $D$2; P43)
+S43 [formula]: =IF($K43 = "USD"; R43 * $D$2; R43)
+U43 [formula]: =IF($K43 = "USD"; T43 * $D$2; T43)
+W43 [formula]: =IF($K43 = "USD"; V43 * $D$2; V43)
+B44 [value]: 4885.36
+C44 [formula]: =IF(D44 = "USD"; B44 * $D$2; B44)
+D44 [value]: ARS
+E44 [value]: Google One
+F44 [value]: Si
+G44 [value]: Visa 7235
+J44 [value]: Google One
+K44 [value]: ARS
+L44 [value]: 2.99
+M44 [formula]: =IF($K44 = "USD"; L44 * $D$2; L44)
+N44 [value]: 4885.36
+O44 [formula]: =IF($K44 = "USD"; N44 * $D$2; N44)
+P44 [value]: 4885.36
+Q44 [formula]: =IF($K44 = "USD"; P44 * $D$2; P44)
+R44 [value]: 4885.36
+S44 [formula]: =IF($K44 = "USD"; R44 * $D$2; R44)
+T44 [value]: 4885.36
+U44 [formula]: =IF($K44 = "USD"; T44 * $D$2; T44)
+V44 [value]: 4885.36
+W44 [formula]: =IF($K44 = "USD"; V44 * $D$2; V44)
+B45 [value]: 8853.39
+C45 [formula]: =IF(D45 = "USD"; B45 * $D$2; B45)
+D45 [value]: ARS
+E45 [value]: Spotify
+F45 [value]: Si
+G45 [value]: Visa 7235
+J45 [value]: Spotify
+K45 [value]: ARS
+L45 [value]: 8853.39
+M45 [formula]: =IF($K45 = "USD"; L45 * $D$2; L45)
+N45 [value]: 8853.39
+O45 [formula]: =IF($K45 = "USD"; N45 * $D$2; N45)
+P45 [value]: 8853.39
+Q45 [formula]: =IF($K45 = "USD"; P45 * $D$2; P45)
+R45 [value]: 8853.39
+S45 [formula]: =IF($K45 = "USD"; R45 * $D$2; R45)
+T45 [value]: 8853.39
+U45 [formula]: =IF($K45 = "USD"; T45 * $D$2; T45)
+V45 [value]: 8853.39
+W45 [formula]: =IF($K45 = "USD"; V45 * $D$2; V45)
+B46 [value]: 10946.39
+C46 [formula]: =IF(D46 = "USD"; B46 * $D$2; B46)
+D46 [value]: ARS
+E46 [value]: Youtube Premium
+F46 [value]: Si
+G46 [value]: Visa 7235
+J46 [value]: Youtube Premium
+K46 [value]: ARS
+L46 [value]: 10946.39
+M46 [formula]: =IF($K46 = "USD"; L46 * $D$2; L46)
+N46 [value]: 10946.39
+O46 [formula]: =IF($K46 = "USD"; N46 * $D$2; N46)
+P46 [value]: 10946.39
+Q46 [formula]: =IF($K46 = "USD"; P46 * $D$2; P46)
+R46 [value]: 10946.39
+S46 [formula]: =IF($K46 = "USD"; R46 * $D$2; R46)
+T46 [value]: 10946.39
+U46 [formula]: =IF($K46 = "USD"; T46 * $D$2; T46)
+V46 [value]: 10946.39
+W46 [formula]: =IF($K46 = "USD"; V46 * $D$2; V46)
+B47 [value]: 32198.39
+C47 [formula]: =IF(D47 = "USD"; B47 * $D$2; B47)
+D47 [value]: ARS
+E47 [value]: Netflix
+F47 [value]: Si
+G47 [value]: Visa 7235
+J47 [value]: Netflix
+K47 [value]: ARS
+L47 [value]: 32198.39
+M47 [formula]: =IF($K47 = "USD"; L47 * $D$2; L47)
+N47 [value]: 32198.39
+O47 [formula]: =IF($K47 = "USD"; N47 * $D$2; N47)
+P47 [value]: 32198.39
+Q47 [formula]: =IF($K47 = "USD"; P47 * $D$2; P47)
+R47 [value]: 32198.39
+S47 [formula]: =IF($K47 = "USD"; R47 * $D$2; R47)
+T47 [value]: 32198.39
+U47 [formula]: =IF($K47 = "USD"; T47 * $D$2; T47)
+V47 [value]: 32198.39
+W47 [formula]: =IF($K47 = "USD"; V47 * $D$2; V47)
+B48 [value]: 0
+C48 [formula]: =IF(D48 = "USD"; B48 * $D$2; B48)
+D48 [value]: ARS
+E48 [value]: Cine Fan
+F48 [value]: Si
+G48 [value]: TBD
+J48 [value]: Cine Fan
+K48 [value]: ARS
+L48 [value]: 0
+M48 [formula]: =IF($K48 = "USD"; L48 * $D$2; L48)
+N48 [value]: 0
+O48 [formula]: =IF($K48 = "USD"; N48 * $D$2; N48)
+P48 [value]: 0
+Q48 [formula]: =IF($K48 = "USD"; P48 * $D$2; P48)
+R48 [value]: 0
+S48 [formula]: =IF($K48 = "USD"; R48 * $D$2; R48)
+T48 [value]: 0
+U48 [formula]: =IF($K48 = "USD"; T48 * $D$2; T48)
+V48 [value]: 0
+W48 [formula]: =IF($K48 = "USD"; V48 * $D$2; V48)
+B49 [value]: 18400
+C49 [formula]: =IF(D49 = "USD"; B49 * $D$2; B49)
+D49 [value]: ARS
+E49 [value]: Meli 6
+F49 [value]: Si
+G49 [value]: Visa 7235
+J49 [value]: Meli 6
+K49 [value]: ARS
+L49 [value]: 0
+M49 [formula]: =IF($K49 = "USD"; L49 * $D$2; L49)
+N49 [value]: 0
+O49 [formula]: =IF($K49 = "USD"; N49 * $D$2; N49)
+P49 [value]: 0
+Q49 [formula]: =IF($K49 = "USD"; P49 * $D$2; P49)
+R49 [value]: 0
+S49 [formula]: =IF($K49 = "USD"; R49 * $D$2; R49)
+T49 [value]: 0
+U49 [formula]: =IF($K49 = "USD"; T49 * $D$2; T49)
+V49 [value]: 0
+W49 [formula]: =IF($K49 = "USD"; V49 * $D$2; V49)
+B50 [value]: 0
+C50 [formula]: =IF(D50 = "USD"; B50 * $D$2; B50)
+D50 [value]: ARS
+E50 [value]: Disney+
+F50 [value]: Si
+G50 [value]: Visa 7235
+J50 [value]: Disney+
+K50 [value]: ARS
+L50 [value]: 0
+M50 [formula]: =IF($K50 = "USD"; L50 * $D$2; L50)
+N50 [value]: 0
+O50 [formula]: =IF($K50 = "USD"; N50 * $D$2; N50)
+P50 [value]: 0
+Q50 [formula]: =IF($K50 = "USD"; P50 * $D$2; P50)
+R50 [value]: 0
+S50 [formula]: =IF($K50 = "USD"; R50 * $D$2; R50)
+T50 [value]: 0
+U50 [formula]: =IF($K50 = "USD"; T50 * $D$2; T50)
+V50 [value]: 0
+W50 [formula]: =IF($K50 = "USD"; V50 * $D$2; V50)
+B51 [value]: 0
+C51 [formula]: =IF(D51 = "USD"; B51 * $D$2; B51)
+D51 [value]: ARS
+E51 [value]: HBO Max
+F51 [value]: Si
+G51 [value]: Visa 7235
+J51 [value]: HBO Max
+K51 [value]: ARS
+L51 [value]: 7105.7
+M51 [formula]: =IF($K51 = "USD"; L51 * $D$2; L51)
+N51 [value]: 0
+O51 [formula]: =IF($K51 = "USD"; N51 * $D$2; N51)
+P51 [value]: 7105.7
+Q51 [formula]: =IF($K51 = "USD"; P51 * $D$2; P51)
+R51 [value]: 7105.7
+S51 [formula]: =IF($K51 = "USD"; R51 * $D$2; R51)
+T51 [value]: 7105.7
+U51 [formula]: =IF($K51 = "USD"; T51 * $D$2; T51)
+V51 [value]: 7105.7
+W51 [formula]: =IF($K51 = "USD"; V51 * $D$2; V51)
+B52 [value]: 0
+C52 [formula]: =IF(D52 = "USD"; B52 * $D$2; B52)
+D52 [value]: ARS
+E52 [value]: Paramount+
+F52 [value]: Si
+G52 [value]: Visa 7235
+J52 [value]: Paramount+
+K52 [value]: ARS
+L52 [value]: 1119.3
+M52 [formula]: =IF($K52 = "USD"; L52 * $D$2; L52)
+N52 [value]: 0
+O52 [formula]: =IF($K52 = "USD"; N52 * $D$2; N52)
+P52 [value]: 1119.3
+Q52 [formula]: =IF($K52 = "USD"; P52 * $D$2; P52)
+R52 [value]: 1119.3
+S52 [formula]: =IF($K52 = "USD"; R52 * $D$2; R52)
+T52 [value]: 1119.3
+U52 [formula]: =IF($K52 = "USD"; T52 * $D$2; T52)
+V52 [value]: 1119.3
+W52 [formula]: =IF($K52 = "USD"; V52 * $D$2; V52)
+B53 [value]: 0
+C53 [formula]: =IF(D53 = "USD"; B53 * $D$2; B53)
+D53 [value]: USD
+E53 [value]: Prime US
+F53 [value]: Si
+G53 [value]: Visa 7235
+J53 [value]: Prime US
+K53 [value]: USD
+L53 [value]: 0
+M53 [formula]: =IF($K53 = "USD"; L53 * $D$2; L53)
+N53 [value]: 0
+O53 [formula]: =IF($K53 = "USD"; N53 * $D$2; N53)
+P53 [value]: 0
+Q53 [formula]: =IF($K53 = "USD"; P53 * $D$2; P53)
+R53 [value]: 0
+S53 [formula]: =IF($K53 = "USD"; R53 * $D$2; R53)
+T53 [value]: 139
+U53 [formula]: =IF($K53 = "USD"; T53 * $D$2; T53)
+V53 [value]: 139
+W53 [formula]: =IF($K53 = "USD"; V53 * $D$2; V53)
+B54 [value]: 0
+C54 [formula]: =IF(D54 = "USD"; B54 * $D$2; B54)
+D54 [value]: ARS
+E54 [value]: Prime ES
+F54 [value]: Si
+G54 [value]: TBD
+J54 [value]: Prime ES
+K54 [value]: ARS
+L54 [value]: 0
+M54 [formula]: =IF($K54 = "USD"; L54 * $D$2; L54)
+N54 [value]: 0
+O54 [formula]: =IF($K54 = "USD"; N54 * $D$2; N54)
+P54 [value]: 0
+Q54 [formula]: =IF($K54 = "USD"; P54 * $D$2; P54)
+R54 [value]: 0
+S54 [formula]: =IF($K54 = "USD"; R54 * $D$2; R54)
+T54 [value]: 0
+U54 [formula]: =IF($K54 = "USD"; T54 * $D$2; T54)
+V54 [value]: 0
+W54 [formula]: =IF($K54 = "USD"; V54 * $D$2; V54)
+B55 [value]: 0
+C55 [formula]: =IF(D55 = "USD"; B55 * $D$2; B55)
+D55 [value]: ARS
+E55 [value]: 10 Recetas
+F55 [value]: Si
+G55 [value]: TBD
+J55 [value]: 10 Recetas
+K55 [value]: ARS
+L55 [value]: 0
+M55 [formula]: =IF($K55 = "USD"; L55 * $D$2; L55)
+N55 [value]: 0
+O55 [formula]: =IF($K55 = "USD"; N55 * $D$2; N55)
+P55 [value]: 0
+Q55 [formula]: =IF($K55 = "USD"; P55 * $D$2; P55)
+R55 [value]: 0
+S55 [formula]: =IF($K55 = "USD"; R55 * $D$2; R55)
+T55 [value]: 0
+U55 [formula]: =IF($K55 = "USD"; T55 * $D$2; T55)
+V55 [value]: 0
+W55 [formula]: =IF($K55 = "USD"; V55 * $D$2; V55)
+B56 [value]: 0
+C56 [formula]: =IF(D56 = "USD"; B56 * $D$2; B56)
+D56 [value]: ARS
+E56 [value]: CrunchyRoll
+F56 [value]: Si
+G56 [value]: TBD
+J56 [value]: CrunchyRoll
+K56 [value]: ARS
+L56 [value]: 0
+M56 [formula]: =IF($K56 = "USD"; L56 * $D$2; L56)
+N56 [value]: 0
+O56 [formula]: =IF($K56 = "USD"; N56 * $D$2; N56)
+P56 [value]: 0
+Q56 [formula]: =IF($K56 = "USD"; P56 * $D$2; P56)
+R56 [value]: 0
+S56 [formula]: =IF($K56 = "USD"; R56 * $D$2; R56)
+T56 [value]: 0
+U56 [formula]: =IF($K56 = "USD"; T56 * $D$2; T56)
+V56 [value]: 0
+W56 [formula]: =IF($K56 = "USD"; V56 * $D$2; V56)
+B57 [value]: 0
+C57 [formula]: =IF(D57 = "USD"; B57 * $D$2; B57)
+D57 [value]: USD
+E57 [value]: Adobe
+F57 [value]: Si
+G57 [value]: Visa 7235
+J57 [value]: Adobe
+K57 [value]: USD
+L57 [value]: 0
+M57 [formula]: =IF($K57 = "USD"; L57 * $D$2; L57)
+N57 [value]: 0
+O57 [formula]: =IF($K57 = "USD"; N57 * $D$2; N57)
+P57 [value]: 0
+Q57 [formula]: =IF($K57 = "USD"; P57 * $D$2; P57)
+R57 [value]: 0
+S57 [formula]: =IF($K57 = "USD"; R57 * $D$2; R57)
+T57 [value]: 0
+U57 [formula]: =IF($K57 = "USD"; T57 * $D$2; T57)
+V57 [value]: 0
+W57 [formula]: =IF($K57 = "USD"; V57 * $D$2; V57)
+C58 [formula]: =IF(D58 = "USD"; B58 * $D$2; B58)
+M58 [formula]: =IF($K58 = "USD"; L58 * $D$2; L58)
+O58 [formula]: =IF($K58 = "USD"; N58 * $D$2; N58)
+Q58 [formula]: =IF($K58 = "USD"; P58 * $D$2; P58)
+S58 [formula]: =IF($K58 = "USD"; R58 * $D$2; R58)
+U58 [formula]: =IF($K58 = "USD"; T58 * $D$2; T58)
+W58 [formula]: =IF($K58 = "USD"; V58 * $D$2; V58)
+A59 [value]: Gastos Variables
+B59 [value]: 50000
+C59 [formula]: =IF(D59 = "USD"; B59 * $D$2; B59)
+D59 [value]: ARS
+E59 [value]: Supermercado
+F59 [value]: Si
+G59 [value]: Lemon 5233
+I59 [value]: Gastos Variables
+J59 [value]: Supermercado
+K59 [value]: ARS
+L59 [value]: 380000
+M59 [formula]: =IF($K59 = "USD"; L59 * $D$2; L59)
+N59 [value]: 50000
+O59 [formula]: =IF($K59 = "USD"; N59 * $D$2; N59)
+P59 [value]: 100000
+Q59 [formula]: =IF($K59 = "USD"; P59 * $D$2; P59)
+R59 [value]: 150000
+S59 [formula]: =IF($K59 = "USD"; R59 * $D$2; R59)
+T59 [value]: 150000
+U59 [formula]: =IF($K59 = "USD"; T59 * $D$2; T59)
+V59 [value]: 150000
+W59 [formula]: =IF($K59 = "USD"; V59 * $D$2; V59)
+C60 [formula]: =IF(D60 = "USD"; B60 * $D$2; B60)
+M60 [formula]: =IF($K60 = "USD"; L60 * $D$2; L60)
+O60 [formula]: =IF($K60 = "USD"; N60 * $D$2; N60)
+Q60 [formula]: =IF($K60 = "USD"; P60 * $D$2; P60)
+S60 [formula]: =IF($K60 = "USD"; R60 * $D$2; R60)
+U60 [formula]: =IF($K60 = "USD"; T60 * $D$2; T60)
+W60 [formula]: =IF($K60 = "USD"; V60 * $D$2; V60)
+A61 [value]: Gastos Extraordinarios
+B61 [value]: 117500
+C61 [formula]: =IF(D61 = "USD"; B61 * $D$2; B61)
+D61 [value]: ARS
+E61 [value]: Comida Mascotas
+F61 [value]: Si
+G61 [value]: Transferencia
+I61 [value]: Gastos Extraordinarios
+J61 [value]: Comida Mascotas
+K61 [value]: ARS
+L61 [value]: 335000
+M61 [formula]: =IF($K61 = "USD"; L61 * $D$2; L61)
+N61 [value]: 117500
+O61 [formula]: =IF($K61 = "USD"; N61 * $D$2; N61)
+Q61 [formula]: =IF($K61 = "USD"; P61 * $D$2; P61)
+S61 [formula]: =IF($K61 = "USD"; R61 * $D$2; R61)
+U61 [formula]: =IF($K61 = "USD"; T61 * $D$2; T61)
+W61 [formula]: =IF($K61 = "USD"; V61 * $D$2; V61)
+B62 [value]: 0
+C62 [formula]: =IF(D62 = "USD"; B62 * $D$2; B62)
+D62 [value]: ARS
+F62 [value]: Si
+G62 [value]: Transferencia
+J62 [value]: Monse
+K62 [value]: ARS
+L62 [value]: 0
+M62 [formula]: =IF($K62 = "USD"; L62 * $D$2; L62)
+N62 [value]: 0
+O62 [formula]: =IF($K62 = "USD"; N62 * $D$2; N62)
+P62 [formula]: =227500
+Q62 [formula]: =IF($K62 = "USD"; P62 * $D$2; P62)
+R62 [value]: 55000
+S62 [formula]: =IF($K62 = "USD"; R62 * $D$2; R62)
+U62 [formula]: =IF($K62 = "USD"; T62 * $D$2; T62)
+W62 [formula]: =IF($K62 = "USD"; V62 * $D$2; V62)
+B63 [value]: 0
+C63 [formula]: =IF(D63 = "USD"; B63 * $D$2; B63)
+D63 [value]: ARS
+F63 [value]: Si
+G63 [value]: Transferencia
+J63 [value]: Viaje Ruffiano
+K63 [value]: ARS
+P63 [formula]: =(130*1900)+146276,15+200000
+Q63 [formula]: =IF($K63 = "USD"; P63 * $D$2; P63)
+C64 [formula]: =IF(D64 = "USD"; B64 * $D$2; B64)
+M64 [formula]: =IF($K64 = "USD"; L64 * $D$2; L64)
+O64 [formula]: =IF($K64 = "USD"; N64 * $D$2; N64)
+Q64 [formula]: =IF($K64 = "USD"; P64 * $D$2; P64)
+S64 [formula]: =IF($K64 = "USD"; R64 * $D$2; R64)
+U64 [formula]: =IF($K64 = "USD"; T64 * $D$2; T64)
+W64 [formula]: =IF($K64 = "USD"; V64 * $D$2; V64)
+A65 [value]: Deudas
+B65 [value]: 0
+C65 [formula]: =IF(D65 = "USD"; B65 * $D$2; B65)
+D65 [value]: ARS
+E65 [value]: Contrato
+F65 [value]: Si
+G65 [value]: Transferencia
+I65 [value]: Deudas
+J65 [value]: Contrato
+K65 [value]: ARS
+L65 [value]: 0
+M65 [formula]: =IF($K65 = "USD"; L65 * $D$2; L65)
+N65 [value]: 0
+O65 [formula]: =IF($K65 = "USD"; N65 * $D$2; N65)
+Q65 [formula]: =IF($K65 = "USD"; P65 * $D$2; P65)
+S65 [formula]: =IF($K65 = "USD"; R65 * $D$2; R65)
+T65 [value]: 400000
+U65 [formula]: =IF($K65 = "USD"; T65 * $D$2; T65)
+W65 [formula]: =IF($K65 = "USD"; V65 * $D$2; V65)
+B66 [formula]: =205833,49+242680,32+193208,66
+C66 [formula]: =IF(D66 = "USD"; B66 * $D$2; B66)
+D66 [value]: ARS
+E66 [value]: Tarjetas Guada
+F66 [value]: Si
+G66 [value]: Transferencia
+J66 [value]: Tarjetas Guada
+K66 [value]: ARS
+L66 [value]: 0
+M66 [formula]: =IF($K66 = "USD"; L66 * $D$2; L66)
+N66 [formula]: =205833,49+242680,32+193208,66
+O66 [formula]: =IF($K66 = "USD"; N66 * $D$2; N66)
+P66 [formula]: =197166,66+(60000+32000+80000+52000+160000)
+Q66 [formula]: =IF($K66 = "USD"; P66 * $D$2; P66)
+B67 [value]: 0
+C67 [formula]: =IF(D67 = "USD"; B67 * $D$2; B67)
+D67 [value]: ARS
+E67 [value]: Jenny
+F67 [value]: Si
+G67 [value]: Transferencia
+J67 [value]: Jenny
+K67 [value]: ARS
+L67 [value]: 0
+M67 [formula]: =IF($K67 = "USD"; L67 * $D$2; L67)
+N67 [value]: 0
+O67 [formula]: =IF($K67 = "USD"; N67 * $D$2; N67)
+P67 [value]: 0
+Q67 [formula]: =IF($K67 = "USD"; P67 * $D$2; P67)
+R67 [value]: 230000
+S67 [formula]: =IF($K67 = "USD"; R67 * $D$2; R67)
+U67 [formula]: =IF($K67 = "USD"; T67 * $D$2; T67)
+W67 [formula]: =IF($K67 = "USD"; V67 * $D$2; V67)
+B68 [value]: 100000
+C68 [formula]: =IF(D68 = "USD"; B68 * $D$2; B68)
+D68 [value]: ARS
+E68 [value]: Juan
+F68 [value]: Si
+G68 [value]: Transferencia
+J68 [value]: Juan
+K68 [value]: ARS
+L68 [value]: 0
+M68 [formula]: =IF($K68 = "USD"; L68 * $D$2; L68)
+N68 [value]: 100000
+O68 [formula]: =IF($K68 = "USD"; N68 * $D$2; N68)
+P68 [value]: 0
+Q68 [formula]: =IF($K68 = "USD"; P68 * $D$2; P68)
+R68 [value]: 300000
+S68 [formula]: =IF($K68 = "USD"; R68 * $D$2; R68)
+T68 [value]: 300000
+U68 [formula]: =IF($K68 = "USD"; T68 * $D$2; T68)
+V68 [value]: 300000
+W68 [formula]: =IF($K68 = "USD"; V68 * $D$2; V68)
+B69 [value]: 0
+C69 [formula]: =IF(D69 = "USD"; B69 * $D$2; B69)
+D69 [value]: USD
+E69 [value]: Chris
+F69 [value]: Si
+G69 [value]: Transferencia
+J69 [value]: Chris
+K69 [value]: USD
+L69 [value]: 0
+M69 [formula]: =IF($K69 = "USD"; L69 * $D$2; L69)
+N69 [value]: 0
+O69 [formula]: =IF($K69 = "USD"; N69 * $D$2; N69)
+P69 [value]: 0
+Q69 [formula]: =IF($K69 = "USD"; P69 * $D$2; P69)
+R69 [value]: 0
+S69 [formula]: =IF($K69 = "USD"; R69 * $D$2; R69)
+T69 [value]: 0
+U69 [formula]: =IF($K69 = "USD"; T69 * $D$2; T69)
+V69 [value]: 300
+W69 [formula]: =IF($K69 = "USD"; V69 * $D$2; V69)
+C71 [formula]: =SUMIF(F14:F69; "No"; C14:C69)
+D71 [value]: Subtotal
+L71 [value]: Subtotal
+M71 [formula]: =SUM(M14:M69)
+O71 [formula]: =SUM(O14:O69)
+Q71 [formula]: =SUM(Q14:Q69)
+S71 [formula]: =SUM(S14:S69)
+U71 [formula]: =SUM(U14:U69)
+W71 [formula]: =SUM(W14:W69)
