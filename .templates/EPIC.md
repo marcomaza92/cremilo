@@ -28,3 +28,11 @@ Business Value: [The "Why" – How does this improve the product or user experie
 - [ ] Appium mobile verification completed.
 - [ ] Documentation updated.
 - [ ] Successfully deployed to Vercel staging/production.
+
+## Related Tasks
+
+- [List of related tasks.]
+
+## Related Teams
+
+- [List of related teams.]

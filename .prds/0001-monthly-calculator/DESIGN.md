@@ -1,3 +1,12 @@
+# Design
+
+## Prompts
+
+- Create a mobile configuration screen for the monthly calculator with rates, format, and advanced global currency sections
+- Create a desktop Agregar Ítem modal with a two-column form layout over a dimmed dashboard background
+
+---
+
 ## Summary Boxes
 
 - There should be a box with the total incomes, total outcomes and the net balance in the

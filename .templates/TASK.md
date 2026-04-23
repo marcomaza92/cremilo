@@ -10,16 +10,16 @@ So that [Value/Benefit]
 - [ ] AC 2: [Specific, measurable requirement.]
 - [ ] AC 3: [Error handling or edge case requirement.]
 
+## Design & UX
+
+- Stitch Link: [Link to the design prototype or component.]
+- Responsive Behavior: [Mobile vs. Desktop specific requirements.]
+
 ## Technical implementation
 
 - Service/Hook: [e.g., Tanstack Query implementation details.]
 - API/Database: [Supabase tables or Edge Functions involved.]
 - Styling: [SCSS Module class naming or layout specifics.]
-
-## Design & UX
-
-- Stitch Link: [Link to the design prototype or component.]
-- Responsive Behavior: [Mobile vs. Desktop specific requirements.]
 
 ## Quality Assurance (QA)
 
@@ -29,4 +29,6 @@ So that [Value/Benefit]
 
 ## Deployment Notes
 
+- [Any specific about the branch deployment in Vercel.]
+- [Link to the deployed branch (if any).]
 - [Any specific Environment Variables or Supabase Migrations required.]
