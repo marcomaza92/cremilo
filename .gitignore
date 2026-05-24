@@ -45,3 +45,8 @@ next-env.d.ts
 .docs/pending-agents.json
 .docs/gate-watcher.log
 .docs/agent-logs/*.log
+
+# Playwright runtime artifacts
+/playwright-report/
+/test-results/
+/playwright/.cache/
