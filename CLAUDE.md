@@ -40,6 +40,13 @@ Cremilo is a multi-app finance *suite* (Monthly Calculator + Credit Cards + Inve
 - **Stitch project ID**: `9329790636631148728`. Design system asset: `assets/f7ec1a75b48d4b5985962fbe7074ce76`.
 - **Gates**: Gate 0 (PRD approval) → Gate 1 (Design approval, per D-XX) → Gate 2 (Deploy). Gate-watcher enforces both Accessibility + Manual review checklists are fully ticked before propagating D-XX → DEV.
 
+## Git workflow
+
+- **Every change goes through a PR.** No direct commits to `main` — not even for one-line doc edits, typo fixes, or convention updates. The discipline applies to every change.
+- **Conventional commits required.** Format: `type(scope?): subject`, where type is one of `feat | fix | chore | docs | refactor | test | ci | perf | style | build | revert`. Subject in imperative mood, no trailing period.
+- **PR merge strategy: rebase + delete branch.** Use `gh pr merge <n> --rebase --delete-branch` (or the GitHub UI "Rebase and merge" button). Never squash. Never create merge commits.
+- **Rebase the feature branch onto latest `main` before merging.** The PR's own history should be linear — no internal merge commits. Each commit on a feature branch should be reviewable + revertable on its own, since it lands individually on `main`.
+
 ## What this session should and shouldn't do
 
 - ✅ Ship the active Phase A milestone (see `next_action` in `~/www/personal/docs/cremilo/ROADMAP.md` frontmatter).
