@@ -22,7 +22,7 @@ const Login = async ({ searchParams }: LoginPageProps) => {
           </div>
         )}
 
-        <form className={styles.form} action={login}>
+        <form className={styles.form} action={login} noValidate>
           <div className={styles.form__field}>
             <label className={styles.form__label} htmlFor="email">
               Email

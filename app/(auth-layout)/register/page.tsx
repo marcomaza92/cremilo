@@ -22,7 +22,7 @@ const Register = async ({ searchParams }: RegisterPageProps) => {
           </div>
         )}
 
-        <form className={styles.form} action={register}>
+        <form className={styles.form} action={register} noValidate>
           <div className={styles.form__field}>
             <label className={styles.form__label} htmlFor="email">
               Email
