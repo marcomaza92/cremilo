@@ -46,6 +46,19 @@ Cremilo is a multi-app finance *suite* (Monthly Calculator + Credit Cards + Inve
 - **Conventional commits required.** Format: `type(scope?): subject`, where type is one of `feat | fix | chore | docs | refactor | test | ci | perf | style | build | revert`. Subject in imperative mood, no trailing period.
 - **PR merge strategy: rebase + delete branch.** Use `gh pr merge <n> --rebase --delete-branch` (or the GitHub UI "Rebase and merge" button). Never squash. Never create merge commits.
 - **Rebase the feature branch onto latest `main` before merging.** The PR's own history should be linear — no internal merge commits. Each commit on a feature branch should be reviewable + revertable on its own, since it lands individually on `main`.
+- **Shipping signal: `ready-to-merge` label.** When the PR's test plan has been verified, add the `ready-to-merge` label. A GitHub Action ([.github/workflows/auto-merge.yml](.github/workflows/auto-merge.yml)) calls `gh pr merge --auto --rebase --delete-branch`, which merges as soon as CI is green. The label is the *explicit "human verified, ship it" signal* — distinct from test-plan checkboxes (which are your *progress tracker*, not a shipping trigger).
+
+## Where feedback on a PR lives
+
+| Case | Where | Definition |
+|---|---|---|
+| Defect against the PR's spec (ticket + linked design) | PR comment + fix in same PR | "It's in scope and we didn't ship it correctly" |
+| New work outside the spec | New Linear issue | "Design didn't cover this; ticket didn't mention it" |
+| Context / decisions / deferrals | Linear comment on parent | Not actionable yet |
+
+**Design is spec.** When DEV-XX implements D-XX, the approved design (Stitch screens + DESIGN.md tokens) is the contract — even when the Linear ticket only links to the design rather than listing every UI behavior individually. Gate-watcher enforces this implicitly: D-XX must be approved (Accessibility + Manual review checklists ticked) before DEV-XX moves forward. So if behavior X is in the approved design, X is required for DEV-XX even when the ticket text doesn't echo it.
+
+**`~/www/personal/docs/cremilo/ANNOY.md` is for *pipeline annoyances***, not for feature requests against the app. Don't conflate.
 
 ## What this session should and shouldn't do
 
