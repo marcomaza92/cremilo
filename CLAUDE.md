@@ -15,6 +15,7 @@ Operational docs live **outside** the repo at `~/www/personal/docs/cremilo/` —
 - `~/www/personal/docs/cremilo/POST-MORTEM-AND-PLAN.md` — strategic context. Phases A–E. The "why" behind the plan.
 - `~/www/personal/docs/cremilo/ANNOY.md` — append-only annoy log, triaged at Phase B.
 - `~/www/personal/docs/cremilo/USAGE.md` — running history of Claude turns + token usage.
+- `~/www/personal/docs/cremilo/SESSIONS.md` — aggregated session durations (run `session-stats.py` to refresh).
 - `~/www/personal/docs/cremilo/agents/` — per-agent rationale docs.
 
 In-repo specs:
@@ -50,6 +51,7 @@ Cremilo is a multi-app finance *suite* (Monthly Calculator + Credit Cards + Inve
   - Add the `ready-to-merge` label, or
   - Post a PR comment whose *entire body* is exactly `/merge` or `/ship`.
   Both trigger GitHub Actions that call `gh pr merge --auto --rebase --delete-branch` — the PR lands as soon as CI is green. Workflows live at [.github/workflows/auto-merge.yml](.github/workflows/auto-merge.yml) (label trigger) and [.github/workflows/auto-merge-comment.yml](.github/workflows/auto-merge-comment.yml) (slash-command trigger). The comment workflow verifies the commenter has `admin` or `write` permission before queueing the merge. Both signals are *explicit "human verified, ship it"* — distinct from test-plan checkboxes (your *progress tracker*, not a shipping trigger).
+- **Workflow-changing PRs always merge manually.** GitHub Actions runs each workflow from `main`, not from the PR branch. A PR that *fixes* the auto-merge workflow will still trigger the *broken* version on `main` when you comment `/ship`. So PRs that touch `.github/workflows/auto-merge*.yml` need `gh pr merge <n> --rebase --delete-branch` directly. The next PR after merging can use the label / slash command flow normally.
 
 ## Where feedback on a PR lives
 
@@ -68,6 +70,7 @@ Cremilo is a multi-app finance *suite* (Monthly Calculator + Credit Cards + Inve
 - ✅ Ship the active Phase A milestone (see `next_action` in `~/www/personal/docs/cremilo/ROADMAP.md` frontmatter).
 - ✅ Update `~/www/personal/docs/cremilo/ROADMAP.md` frontmatter at session end.
 - ✅ Append to `~/www/personal/docs/cremilo/ANNOY.md` if something slowed you down.
+- ✅ Run `python3 ~/www/personal/docs/cremilo/session-stats.py --append` at session end to log net session time to `SESSIONS.md` (substrate for Phase C effort comparison).
 - ❌ Don't refactor the pipeline.
 - ❌ Don't add new agents.
 - ❌ Don't improve SKILLs beyond what's needed to unblock today's milestone.
