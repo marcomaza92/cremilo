@@ -17,7 +17,7 @@ export async function register(formData: FormData) {
   const { error } = await supabase.auth.signUp(data);
 
   if (error) {
-    redirect("/register");
+    redirect("/register?error=" + encodeURIComponent(error.message));
   }
 
   revalidatePath("/dashboard", "page");
