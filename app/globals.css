@@ -1,1 +1,5 @@
-@import "nequi/css/index.css";
+body {
+  font-family: var(--font-body), "Space Grotesk", sans-serif;
+  background: #fcf9f8;
+  color: #1c1b1b;
+}
