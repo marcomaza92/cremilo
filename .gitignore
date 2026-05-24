@@ -37,3 +37,11 @@ next-env.d.ts
 
 # .env
 .env
+
+# Claude
+.claude/settings.local.json
+
+# Gate-watcher runtime state
+.docs/pending-agents.json
+.docs/gate-watcher.log
+.docs/agent-logs/*.log
