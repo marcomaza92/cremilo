@@ -14,15 +14,17 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+    env:
+      # gh CLI needs an explicit repo target when there's no git checkout in the runner.
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
     steps:
       - name: Verify commenter has merge permission
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
           ACTOR: ${{ github.event.comment.user.login }}
         run: |
           set -euo pipefail
-          perm=$(gh api "repos/$REPO/collaborators/$ACTOR/permission" --jq '.permission' 2>/dev/null || echo "none")
+          perm=$(gh api "repos/${GH_REPO}/collaborators/$ACTOR/permission" --jq '.permission' 2>/dev/null || echo "none")
           echo "User '$ACTOR' has repo permission: $perm"
           case "$perm" in
             admin|write) echo "Authorized." ;;
@@ -34,7 +36,6 @@ jobs:
 
       - name: Acknowledge command on the PR
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR: ${{ github.event.issue.number }}
           ACTOR: ${{ github.event.comment.user.login }}
           CMD: ${{ github.event.comment.body }}
@@ -43,6 +44,5 @@ jobs:
 
       - name: Enable native auto-merge (rebase, delete branch)
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR: ${{ github.event.issue.number }}
         run: gh pr merge "$PR" --auto --rebase --delete-branch

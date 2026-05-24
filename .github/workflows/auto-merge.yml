@@ -11,9 +11,12 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+    env:
+      # gh CLI needs an explicit repo target when there's no git checkout in the runner.
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
     steps:
       - name: Enable native auto-merge (rebase, delete branch)
-        run: gh pr merge "$PR" --auto --rebase --delete-branch
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR: ${{ github.event.pull_request.number }}
+        run: gh pr merge "$PR" --auto --rebase --delete-branch
