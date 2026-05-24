@@ -4,10 +4,10 @@ This is an equivalent / translator to Linear.app concepts
 
 ## Glossary
 
-Epic = Project inside a Team
-Task = Issue
-Bug = Issue
-Issue = Issue
+- Epic = Project inside a Team
+- Task = Issue
+- Bug = Issue
+- Issue = Issue
 
 ## Structure of the Items
 

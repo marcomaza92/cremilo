@@ -36,7 +36,7 @@ The "Monthly Calculator" epic serves as the core intelligence of the application
 
 - **Frontend**: **Next.js** (App Router) for SEO and server-side rendering of financial summaries.
 - **State & Data**: **TanStack Query** for asynchronous financial data fetching and **TanStack Table** for managing complex grids (e.g., "Cronograma de Vencimientos").
-- **Styling**: **SCSS Modules** for scoped, maintainable styling following the Stitch design system.
+- **Styling**: **CSS Modules** for scoped, maintainable styling following the Stitch design system.
 - **Backend/Database**: **Supabase** for PostgreSQL storage, authentication, and real-time updates to balances across devices.
 
 ---
