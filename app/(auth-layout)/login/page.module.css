@@ -1,0 +1,152 @@
+.card {
+  background: #ffffff;
+  border: 3px solid #111111;
+  box-shadow: 6px 6px 0px #111111;
+  width: 100%;
+  max-width: 420px;
+}
+
+.card__stripe {
+  height: 8px;
+  background: #f5c400;
+}
+
+.card__body {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.card__title {
+  font-family: var(--font-headline), "Bebas Neue", sans-serif;
+  font-size: 48px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #111111;
+  margin: 0;
+}
+
+.card__footer {
+  font-family: var(--font-body), "Space Grotesk", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #111111;
+  margin: 0;
+}
+
+.card__link {
+  font-family: var(--font-body), "Space Grotesk", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1d54c7;
+  text-decoration: underline;
+}
+
+.card__link:hover {
+  color: #111111;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form__label {
+  font-family: var(--font-body), "Space Grotesk", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #111111;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.form__input {
+  font-family: var(--font-body), "Space Grotesk", sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: #111111;
+  background: #ffffff;
+  border: 3px solid #111111;
+  border-radius: 0;
+  padding: 12px 14px;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 48px;
+  outline: none;
+  transition: background 0.1s ease;
+}
+
+.form__input:focus {
+  background: #f6f3f2;
+  outline: 4px solid #111111;
+  outline-offset: 0;
+}
+
+.form__input::placeholder {
+  color: #906f6b;
+}
+
+.form__submit {
+  font-family: var(--font-headline), "Bebas Neue", sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #ffffff;
+  background: #b20112;
+  border: 3px solid #111111;
+  border-radius: 0;
+  box-shadow: 6px 6px 0px #111111;
+  padding: 14px 24px;
+  width: 100%;
+  min-height: 48px;
+  cursor: pointer;
+  transition: box-shadow 0.08s ease, transform 0.08s ease;
+  margin-top: 8px;
+}
+
+.form__submit:hover {
+  background: #d62828;
+}
+
+.form__submit:active {
+  box-shadow: 0px 0px 0px #111111;
+  transform: translate(6px, 6px);
+}
+
+.error {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #ffdad6;
+  border: 3px solid #ba1a1a;
+  padding: 12px 14px;
+}
+
+.error__icon {
+  font-family: var(--font-headline), "Bebas Neue", sans-serif;
+  font-size: 20px;
+  color: #93000a;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.error__message {
+  font-family: var(--font-body), "Space Grotesk", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #93000a;
+  margin: 0;
+}

@@ -1,26 +1,16 @@
 import Link from "next/link";
 import styles from "./layout.module.css";
-import { AUTH_URLS } from "@/utils/constants/data";
 
 const AuthLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <>
-      <header>
-        <nav>
-          <ul>
-            {AUTH_URLS.map(({ href, label }) => (
-              <li key={href}>
-                <Link className="color-base-green" href={href}>
-                  {label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+    <div className={styles.shell}>
+      <header className={styles.header}>
+        <Link className={styles.header__brand} href="/">
+          Crémilo
+        </Link>
       </header>
-      <main>{children}</main>
-      <footer>This is the auth footer</footer>
-    </>
+      <main className={styles.main}>{children}</main>
+    </div>
   );
 };
 
