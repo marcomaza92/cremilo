@@ -12,7 +12,7 @@ Use this skill when acting as the Product Owner or Scrum Master role for the Cre
 
 ## Workflow
 
-1. Read `.prds/`, `.templates/`, and `USAGE.md` for context
+1. Read `.prds/`, `.templates/`, and `~/www/personal/docs/cremilo/USAGE.md` for context
 2. Create or update Linear issues with correct labels, status, and descriptions
 3. Set issue status to `In Review` when submitting for approval
 4. Wait for manual approval (do not self-approve)
