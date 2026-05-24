@@ -46,7 +46,10 @@ Cremilo is a multi-app finance *suite* (Monthly Calculator + Credit Cards + Inve
 - **Conventional commits required.** Format: `type(scope?): subject`, where type is one of `feat | fix | chore | docs | refactor | test | ci | perf | style | build | revert`. Subject in imperative mood, no trailing period.
 - **PR merge strategy: rebase + delete branch.** Use `gh pr merge <n> --rebase --delete-branch` (or the GitHub UI "Rebase and merge" button). Never squash. Never create merge commits.
 - **Rebase the feature branch onto latest `main` before merging.** The PR's own history should be linear — no internal merge commits. Each commit on a feature branch should be reviewable + revertable on its own, since it lands individually on `main`.
-- **Shipping signal: `ready-to-merge` label.** When the PR's test plan has been verified, add the `ready-to-merge` label. A GitHub Action ([.github/workflows/auto-merge.yml](.github/workflows/auto-merge.yml)) calls `gh pr merge --auto --rebase --delete-branch`, which merges as soon as CI is green. The label is the *explicit "human verified, ship it" signal* — distinct from test-plan checkboxes (which are your *progress tracker*, not a shipping trigger).
+- **Shipping signals: `ready-to-merge` label OR `/merge` / `/ship` comment.** When the PR's test plan has been verified, either:
+  - Add the `ready-to-merge` label, or
+  - Post a PR comment whose *entire body* is exactly `/merge` or `/ship`.
+  Both trigger GitHub Actions that call `gh pr merge --auto --rebase --delete-branch` — the PR lands as soon as CI is green. Workflows live at [.github/workflows/auto-merge.yml](.github/workflows/auto-merge.yml) (label trigger) and [.github/workflows/auto-merge-comment.yml](.github/workflows/auto-merge-comment.yml) (slash-command trigger). The comment workflow verifies the commenter has `admin` or `write` permission before queueing the merge. Both signals are *explicit "human verified, ship it"* — distinct from test-plan checkboxes (your *progress tracker*, not a shipping trigger).
 
 ## Where feedback on a PR lives
 

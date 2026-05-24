@@ -1,0 +1,48 @@
+name: Auto-merge on comment command
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  merge-on-command:
+    # Only PR comments (issues have pull_request == null); exact match on /merge or /ship.
+    if: >
+      github.event.issue.pull_request != null &&
+      contains(fromJson('["/merge", "/ship"]'), github.event.comment.body)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Verify commenter has merge permission
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          ACTOR: ${{ github.event.comment.user.login }}
+        run: |
+          set -euo pipefail
+          perm=$(gh api "repos/$REPO/collaborators/$ACTOR/permission" --jq '.permission' 2>/dev/null || echo "none")
+          echo "User '$ACTOR' has repo permission: $perm"
+          case "$perm" in
+            admin|write) echo "Authorized." ;;
+            *)
+              echo "::error::User '$ACTOR' lacks merge permission (got: '$perm'); ignoring command."
+              exit 1
+              ;;
+          esac
+
+      - name: Acknowledge command on the PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.issue.number }}
+          ACTOR: ${{ github.event.comment.user.login }}
+          CMD: ${{ github.event.comment.body }}
+        run: |
+          gh pr comment "$PR" --body "🚀 \`$CMD\` from @$ACTOR — queueing native auto-merge (rebase, delete branch). Will land once required checks pass."
+
+      - name: Enable native auto-merge (rebase, delete branch)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.issue.number }}
+        run: gh pr merge "$PR" --auto --rebase --delete-branch
