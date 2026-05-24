@@ -3,14 +3,21 @@
 ## Posture
 
 - Default to critical analysis. Verify before claiming. No sycophancy.
-- Push back on premature optimization and scope creep. The pipeline is on probation — see `.docs/POST-MORTEM-AND-PLAN.md` § 5.4.
+- Push back on premature optimization and scope creep. The pipeline is on probation — see `~/www/personal/docs/cremilo/POST-MORTEM-AND-PLAN.md` § 5.4.
 - When the user gives a premise that affects the plan, test it before acting on it.
 - When codifying a workaround, prove the underlying limitation first. Don't accept "it doesn't work" as the basis for a rule without testing.
 
 ## Orientation (read these first)
 
-- `.docs/ROADMAP.md` — current state (YAML frontmatter), active phase + checklist, blockers, next_action. This is the session-start doc.
-- `.docs/POST-MORTEM-AND-PLAN.md` — strategic context. Phases A–E. The "why" behind the plan.
+Operational docs live **outside** the repo at `~/www/personal/docs/cremilo/` — they're shared notes about the project, not source-of-truth for the code:
+
+- `~/www/personal/docs/cremilo/ROADMAP.md` — current state (YAML frontmatter), active phase + checklist, blockers, next_action. This is the session-start doc.
+- `~/www/personal/docs/cremilo/POST-MORTEM-AND-PLAN.md` — strategic context. Phases A–E. The "why" behind the plan.
+- `~/www/personal/docs/cremilo/ANNOY.md` — append-only annoy log, triaged at Phase B.
+- `~/www/personal/docs/cremilo/USAGE.md` — running history of Claude turns + token usage.
+- `~/www/personal/docs/cremilo/agents/` — per-agent rationale docs.
+
+In-repo specs:
 - `.prds/0001-monthly-calculator/DESIGN.md` — Style guidelines (Mondrian Neobrutalism design system, full tokens) + Design Rubric (18 predicates with verification classes).
 - `.claude/skills/design-agent.md` — design-agent SKILL, operational rules, In-Review comment template.
 
@@ -35,9 +42,9 @@ Cremilo is a multi-app finance *suite* (Monthly Calculator + Credit Cards + Inve
 
 ## What this session should and shouldn't do
 
-- ✅ Ship the active Phase A milestone (see `next_action` in ROADMAP.md frontmatter).
-- ✅ Update ROADMAP.md frontmatter at session end.
-- ✅ Append to the annoy log if something slowed you down.
+- ✅ Ship the active Phase A milestone (see `next_action` in `~/www/personal/docs/cremilo/ROADMAP.md` frontmatter).
+- ✅ Update `~/www/personal/docs/cremilo/ROADMAP.md` frontmatter at session end.
+- ✅ Append to `~/www/personal/docs/cremilo/ANNOY.md` if something slowed you down.
 - ❌ Don't refactor the pipeline.
 - ❌ Don't add new agents.
 - ❌ Don't improve SKILLs beyond what's needed to unblock today's milestone.

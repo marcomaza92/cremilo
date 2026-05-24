@@ -191,7 +191,9 @@ def main():
 ---
 """
 
-    usage_file = Path(cwd) / "USAGE.md"
+    # USAGE.md lives outside the repo — it's an operational doc, not code.
+    usage_file = Path.home() / "www" / "personal" / "docs" / "cremilo" / "USAGE.md"
+    usage_file.parent.mkdir(parents=True, exist_ok=True)
     if not usage_file.exists():
         usage_file.write_text("# Usage Log\n\nAuto-generated record of Claude interactions.\n\n---\n\n")
 
