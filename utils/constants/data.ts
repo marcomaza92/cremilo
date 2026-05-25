@@ -6,9 +6,7 @@ export const NAVIGATION_URLS = [
 ];
 
 export const DASHBOARD_URLS = [
-  { href: "/", label: "Overview" },
-  { href: "/debts", label: "Debts" },
-  { href: "/credit-cards", label: "Credit Cards" },
+  { href: "/dashboard", label: "Overview" },
   { href: "/config", label: "Config" },
 ];
 

@@ -1,25 +1,22 @@
 import Link from "next/link";
 import styles from "./layout.module.css";
-import { DASHBOARD_URLS } from "@/utils/constants/data";
 import { Providers } from "@/app/providers";
+import DashboardSidebar from "./Sidebar";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <Providers>
-      <header>
-        <nav>
-          <ul>
-            {DASHBOARD_URLS.map(({ href, label }) => (
-              <li key={href}>
-                <Link className="color-base-green" href={href}>
-                  {label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </header>
-      <main>{children}</main>
+      <div className={styles.shell}>
+        <header className={styles.header}>
+          <Link href="/dashboard" className={styles.header__brand}>
+            Crémilo
+          </Link>
+        </header>
+        <div className={styles.body}>
+          <DashboardSidebar />
+          <main className={styles.main}>{children}</main>
+        </div>
+      </div>
     </Providers>
   );
 };
