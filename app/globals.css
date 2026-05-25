@@ -1,5 +1,123 @@
+/* Mondrian Neobrutalism design tokens — source of truth for all CSS Modules */
+:root {
+  /* ── Colors ────────────────────────────────────────────────── */
+  --color-surface:                    #fcf9f8;
+  --color-surface-dim:                #dcd9d9;
+  --color-surface-bright:             #fcf9f8;
+  --color-surface-container-lowest:   #ffffff;
+  --color-surface-container-low:      #f6f3f2;
+  --color-surface-container:          #f0edec;
+  --color-surface-container-high:     #ebe7e7;
+  --color-surface-container-highest:  #e5e2e1;
+
+  --color-on-surface:          #1c1b1b;
+  --color-on-surface-variant:  #5c403d;
+  --color-inverse-surface:     #313030;
+  --color-inverse-on-surface:  #f3f0ef;
+
+  --color-outline:         #906f6b;
+  --color-outline-variant: #e5bdb9;
+
+  /* Primary — red */
+  --color-primary:              #b20112;
+  --color-on-primary:           #ffffff;
+  --color-primary-container:    #d62828;
+  --color-on-primary-container: #fff1ef;
+  --color-inverse-primary:      #ffb4ab;
+  --color-surface-tint:         #bd1119;
+
+  /* Secondary — blue */
+  --color-secondary:              #1d54c7;
+  --color-on-secondary:           #ffffff;
+  --color-secondary-container:    #3f6ee1;
+  --color-on-secondary-container: #fefcff;
+
+  /* Tertiary — yellow */
+  --color-tertiary:              #745b00;
+  --color-on-tertiary:           #ffffff;
+  --color-tertiary-container:    #d0a600;
+  --color-on-tertiary-container: #4f3d00;
+
+  /* Error */
+  --color-error:              #ba1a1a;
+  --color-on-error:           #ffffff;
+  --color-error-container:    #ffdad6;
+  --color-on-error-container: #93000a;
+
+  /* Background */
+  --color-background:    #fcf9f8;
+  --color-on-background: #1c1b1b;
+
+  /* Brand overrides — high-contrast UI accents */
+  --color-brand-red:    #d62828;
+  --color-brand-blue:   #0047bb;
+  --color-brand-yellow: #f5c400;
+  --color-brand-black:  #111111;
+
+  /* ── Typography ─────────────────────────────────────────────── */
+  --font-display: var(--font-headline), "Bebas Neue", sans-serif;
+  --font-body:    var(--font-body-var), "Space Grotesk", sans-serif;
+
+  /* ── Spacing (4px base unit) ─────────────────────────────────── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+
+  /* ── Neobrutalism geometry ───────────────────────────────────── */
+  --border-width:   3px;
+  --border-color:   var(--color-brand-black);
+  --shadow-offset:  4px;
+  --shadow-color:   var(--color-brand-black);
+  --shadow:         var(--shadow-offset) var(--shadow-offset) 0 var(--shadow-color);
+  --radius:         0px;
+
+  /* ── Transitions ─────────────────────────────────────────────── */
+  --transition-fast: 150ms ease-in-out;
+}
+
+/* Reset & base */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
 body {
-  font-family: var(--font-body), "Space Grotesk", sans-serif;
-  background: #fcf9f8;
-  color: #1c1b1b;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--color-background);
+  color: var(--color-on-background);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  line-height: 100%;
+  letter-spacing: 0.02em;
+}
+
+p, a {
+  margin: 0;
+}
+
+a {
+  text-decoration: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+button {
+  border: 0;
+  cursor: pointer;
 }
