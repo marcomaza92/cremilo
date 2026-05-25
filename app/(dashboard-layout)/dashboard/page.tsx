@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import styles from "./page.module.css";
-import { createOperation, logout } from "./actions";
+import { createOperation } from "./actions";
+import { logout } from "../actions";
 import { UserData, UserInfo } from "@/types/user";
 
 const initialUser: UserInfo = {

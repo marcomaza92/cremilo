@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { DASHBOARD_URLS } from "@/utils/constants/data";
+import { logout } from "./actions";
 import styles from "./Sidebar.module.css";
 
 const DashboardSidebar = () => {
@@ -10,8 +11,14 @@ const DashboardSidebar = () => {
 
   return (
     <aside className={styles.sidebar}>
-      <nav aria-label="Dashboard navigation">
-        <ul className={styles.nav}>
+      <div className={styles.sidebar__brand}>
+        <Link href="/dashboard" className={styles.sidebar__brandLink}>
+          <h1 className={styles.sidebar__brandText}>CREMILO</h1>
+        </Link>
+      </div>
+
+      <nav aria-label="Dashboard navigation" className={styles.nav}>
+        <ul className={styles.nav__list}>
           {DASHBOARD_URLS.map(({ href, label }) => {
             const isActive =
               pathname === href ||
@@ -23,13 +30,19 @@ const DashboardSidebar = () => {
                   className={`${styles.navLink} ${isActive ? styles.navLink__active : ""}`}
                   aria-current={isActive ? "page" : undefined}
                 >
-                  {label}
+                  {label.toUpperCase()}
                 </Link>
               </li>
             );
           })}
         </ul>
       </nav>
+
+      <form action={logout} className={styles.sidebar__footer}>
+        <button type="submit" className={styles.sidebar__logout}>
+          LOGOUT
+        </button>
+      </form>
     </aside>
   );
 };
