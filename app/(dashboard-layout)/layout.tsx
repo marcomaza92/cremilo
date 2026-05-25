@@ -1,10 +1,11 @@
 import Link from "next/link";
 import styles from "./layout.module.css";
 import { DASHBOARD_URLS } from "@/utils/constants/data";
+import { Providers } from "@/app/providers";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <>
+    <Providers>
       <header>
         <nav>
           <ul>
@@ -19,7 +20,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         </nav>
       </header>
       <main>{children}</main>
-    </>
+    </Providers>
   );
 };
 
