@@ -1,0 +1,100 @@
+/*
+ * Shared token utilities for CSS Modules.
+ * Import individual class names to apply tokens without writing custom properties inline.
+ * All values reference globals.css :root variables — no hard-coded colours here.
+ */
+
+/* ── Surface backgrounds ─────────────────────────────────────────── */
+.surfaceBase      { background: var(--color-surface); }
+.surfaceLow       { background: var(--color-surface-container-low); }
+.surfaceContainer { background: var(--color-surface-container); }
+.surfaceHigh      { background: var(--color-surface-container-high); }
+.surfaceWhite     { background: var(--color-surface-container-lowest); }
+
+/* ── Text colors ─────────────────────────────────────────────────── */
+.textBase    { color: var(--color-on-surface); }
+.textMuted   { color: var(--color-on-surface-variant); }
+.textPrimary { color: var(--color-primary); }
+
+/* ── Brand accent fills ──────────────────────────────────────────── */
+.fillRed    { background: var(--color-brand-red); }
+.fillBlue   { background: var(--color-brand-blue); }
+.fillYellow { background: var(--color-brand-yellow); }
+.fillBlack  { background: var(--color-brand-black); }
+
+/* ── Neobrutalism border + shadow ────────────────────────────────── */
+.brutalistBorder {
+  border: var(--border-width) solid var(--border-color);
+}
+
+.brutalistShadow {
+  box-shadow: var(--shadow);
+}
+
+.brutalistCard {
+  border: var(--border-width) solid var(--border-color);
+  box-shadow: var(--shadow);
+  background: var(--color-surface-container-lowest);
+  padding: var(--space-6);
+}
+
+/* ── Typography helpers ──────────────────────────────────────────── */
+.headlineLg {
+  font-family: var(--font-display);
+  font-size: 64px;
+  font-weight: 400;
+  line-height: 100%;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.headlineMd {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 100%;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.headlineSm {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 100%;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.bodyLg {
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 150%;
+}
+
+.bodyMd {
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 150%;
+}
+
+.labelBold {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 120%;
+}
+
+.labelSm {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 120%;
+}
+
+/* ── Spacing helpers ─────────────────────────────────────────────── */
+.paddingCard    { padding: var(--space-6); }
+.paddingSection { padding: var(--space-10); }
+.gutter         { padding: 0 var(--space-4); }
