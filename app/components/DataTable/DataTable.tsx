@@ -3,13 +3,16 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import styles from "./DataTable.module.css";
 
+export type RowStatus = "Pendiente" | "Vencido" | "Pagado";
+
 export interface DataTableRow {
   id: string;
   name: string;
   amount: number;
   currency: string;
-  isPaid: boolean;
-  paymentMethod: string | null;
+  dueDate: string;
+  status: RowStatus;
+  children?: DataTableRow[];
 }
 
 export interface DataTableProps {
@@ -24,6 +27,12 @@ export interface DataTableProps {
 function defaultFormatValue(amount: number, currency: string): string {
   return `${currency} ${amount.toLocaleString("es-AR")}`;
 }
+
+const STATUS_ICON: Record<RowStatus, string> = {
+  Pendiente: "⏰",
+  Vencido: "⚠",
+  Pagado: "✓",
+};
 
 function KebabMenu({
   rowId,
@@ -127,6 +136,79 @@ function KebabMenu({
   );
 }
 
+function TableRow({
+  row,
+  depth,
+  onEdit,
+  onDelete,
+  formatValue,
+}: {
+  row: DataTableRow;
+  depth: number;
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
+  formatValue: (amount: number, currency: string) => string;
+}) {
+  const [expanded, setExpanded] = useState(true);
+  const hasChildren = row.children && row.children.length > 0;
+
+  const rowClass = [
+    styles.table__row,
+    styles[`table__row--${row.status.toLowerCase()}`],
+  ].join(" ");
+
+  return (
+    <>
+      <tr className={rowClass}>
+        <td className={styles.table__td}>
+          <span
+            className={styles.table__name}
+            style={depth > 0 ? { paddingLeft: `${depth * 20}px` } : undefined}
+          >
+            {hasChildren && (
+              <button
+                type="button"
+                className={styles.table__expandBtn}
+                aria-label={expanded ? "Collapse" : "Expand"}
+                aria-expanded={expanded}
+                onClick={() => setExpanded((v) => !v)}
+              >
+                {expanded ? "▼" : "▶"}
+              </button>
+            )}
+            {row.name}
+          </span>
+        </td>
+        <td className={styles.table__td}>{formatValue(row.amount, row.currency)}</td>
+        <td className={styles.table__td}>{row.dueDate}</td>
+        <td className={styles.table__td}>
+          <span
+            className={`${styles.badge} ${styles[`badge--${row.status.toLowerCase()}`]}`}
+            aria-label={row.status}
+          >
+            {STATUS_ICON[row.status]} {row.status.toUpperCase()}
+          </span>
+        </td>
+        <td className={`${styles.table__td} ${styles["table__td--actions"]}`}>
+          <KebabMenu rowId={row.id} onEdit={onEdit} onDelete={onDelete} />
+        </td>
+      </tr>
+
+      {hasChildren && expanded &&
+        row.children!.map((child) => (
+          <TableRow
+            key={child.id}
+            row={child}
+            depth={depth + 1}
+            onEdit={onEdit}
+            onDelete={onDelete}
+            formatValue={formatValue}
+          />
+        ))}
+    </>
+  );
+}
+
 export default function DataTable({
   title,
   rows,
@@ -148,33 +230,21 @@ export default function DataTable({
           aria-controls={contentId}
           onClick={() => setCollapsed((v) => !v)}
         >
-          <span
-            className={styles.table__collapseIcon}
-            aria-hidden="true"
-          >
+          <span className={styles.table__collapseIcon} aria-hidden="true">
             {collapsed ? "▶" : "▼"}
           </span>
           <h2 className={styles.table__title}>{title.toUpperCase()}</h2>
-        </button>
-
-        <button
-          type="button"
-          className={styles.table__addBtn}
-          onClick={onAdd}
-          aria-label={`Add item to ${title}`}
-        >
-          + ADD
         </button>
       </div>
 
       <div id={contentId} hidden={collapsed}>
         <table className={styles.table__grid} role="table">
           <thead>
-            <tr className={styles.table__row}>
-              <th className={styles.table__th} scope="col">Item</th>
-              <th className={styles.table__th} scope="col">Value</th>
-              <th className={styles.table__th} scope="col">Paid?</th>
-              <th className={styles.table__th} scope="col">Payment Method</th>
+            <tr className={styles.table__headRow}>
+              <th className={styles.table__th} scope="col">Name</th>
+              <th className={styles.table__th} scope="col">Amount</th>
+              <th className={styles.table__th} scope="col">Due Date</th>
+              <th className={styles.table__th} scope="col">Status</th>
               <th className={styles.table__th} scope="col">
                 <span className="visually-hidden">Actions</span>
               </th>
@@ -183,47 +253,33 @@ export default function DataTable({
           <tbody>
             {rows.length === 0 ? (
               <tr>
-                <td
-                  className={styles.table__empty}
-                  colSpan={5}
-                >
-                  No items yet. Click &ldquo;+ ADD&rdquo; to add one.
+                <td className={styles.table__empty} colSpan={5}>
+                  No items yet.
                 </td>
               </tr>
             ) : (
               rows.map((row) => (
-                <tr key={row.id} className={styles.table__row}>
-                  <td className={styles.table__td}>{row.name}</td>
-                  <td className={styles.table__td}>
-                    {formatValue(row.amount, row.currency)}
-                  </td>
-                  <td className={styles.table__td}>
-                    <span
-                      className={`${styles.badge} ${
-                        row.isPaid
-                          ? styles["badge--paid"]
-                          : styles["badge--unpaid"]
-                      }`}
-                      aria-label={row.isPaid ? "Paid" : "Unpaid"}
-                    >
-                      {row.isPaid ? "✓ Paid" : "✗ Unpaid"}
-                    </span>
-                  </td>
-                  <td className={styles.table__td}>
-                    {row.paymentMethod ?? "—"}
-                  </td>
-                  <td className={`${styles.table__td} ${styles["table__td--actions"]}`}>
-                    <KebabMenu
-                      rowId={row.id}
-                      onEdit={onEdit}
-                      onDelete={onDelete}
-                    />
-                  </td>
-                </tr>
+                <TableRow
+                  key={row.id}
+                  row={row}
+                  depth={0}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                  formatValue={formatValue}
+                />
               ))
             )}
           </tbody>
         </table>
+
+        <button
+          type="button"
+          className={styles.table__addBtn}
+          onClick={onAdd}
+          aria-label={`Add item to ${title}`}
+        >
+          + ADD ITEM
+        </button>
       </div>
     </section>
   );

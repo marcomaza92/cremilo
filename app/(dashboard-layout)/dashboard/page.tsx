@@ -3,6 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 import styles from "./page.module.css";
 import { createOperation } from "./actions";
 import { UserData, UserInfo } from "@/types/user";
+import ExpensesSection from "./ExpensesSection";
 
 const initialUser: UserInfo = {
   id: "",
@@ -52,51 +53,17 @@ const Dashboard = async () => {
   console.log(currentUser);
 
   return (
-    <div>
-      <h1 className="color-base-turquoise">
-        Hello {currentUser.first_name} {currentUser.last_name}
-      </h1>
-      <p>Registered email: {data.user.email}</p>
+    <div className={styles.page}>
+      <header className={styles.page__header}>
+        <h1 className={styles.page__greeting}>
+          Hello, {currentUser.first_name}
+        </h1>
+        <p className={styles.page__email}>{data.user.email}</p>
+      </header>
 
-      <h2 className="color-base-purple">Dashboard</h2>
-      <form action={createOperation}>
-        <label htmlFor="amount">
-          <span>Amount</span>
-          <input name="amount" id="amount" type="number" />
-        </label>
-        <label htmlFor="description">
-          <span>Description</span>
-          <input name="description" id="description" type="text" />
-        </label>
-        <label htmlFor="category">
-          <span>Category</span>
-          <select name="category" id="category">
-            <option defaultValue="Choose a category"></option>
-            <option value="comida">Comida</option>
-            <option value="transporte">Transporte</option>
-            <option value="recreacion">Recreación</option>
-            <option value="isis">Isis</option>
-            <option value="salidas">Salidas</option>
-            <option value="delivery">Delivery</option>
-            <option value="salud">Salud</option>
-            <option value="servicios">Servicios</option>
-            <option value="tarjetas">Tarjetas</option>
-            <option value="mascotas">Mascotas</option>
-            <option value="bazar">Bazar</option>
-          </select>
-        </label>
-        <label htmlFor="paymentMethod">
-          <span>Payment Method</span>
-          <select name="paymentMethod" id="paymentMethod">
-            <option defaultValue="Choose a category"></option>
-            <option value="tarjeta6305">Tarjeta 6305</option>
-            <option value="tarjeta8137">Tarjeta 8137</option>
-            <option value="efectivo">Efectivo</option>
-            <option value="efectivo">Debito</option>
-            <option value="efectivo">Transferencia</option>
-          </select>
-        </label>
-      </form>
+      <main className={styles.page__content}>
+        <ExpensesSection />
+      </main>
     </div>
   );
 };

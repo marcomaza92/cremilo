@@ -3,6 +3,7 @@
 .table {
   border: var(--border-width) solid var(--border-color);
   background: var(--color-surface-container-lowest);
+  box-shadow: var(--shadow);
 }
 
 /* ── Header row ─────────────────────────────────────────────── */
@@ -54,12 +55,16 @@
   margin: 0;
 }
 
+/* ── ADD ITEM button (bottom of table) ──────────────────────── */
+
 .table__addBtn {
-  padding: 0 var(--space-5);
-  background: var(--color-brand-black);
-  color: var(--color-surface-container-lowest);
+  display: block;
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background: transparent;
+  color: var(--color-on-surface-variant);
   border: none;
-  border-left: var(--border-width) solid var(--border-color);
+  border-top: 2px dashed var(--color-outline-variant);
   font-family: var(--font-body);
   font-size: 14px;
   font-weight: 700;
@@ -67,23 +72,18 @@
   text-transform: uppercase;
   cursor: pointer;
   min-height: 48px;
-  min-width: 80px;
-  transition: background var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+  text-align: center;
+  transition: background var(--transition-fast), color var(--transition-fast);
 }
 
 .table__addBtn:hover {
-  background: var(--color-brand-blue);
-  box-shadow: var(--shadow);
-}
-
-.table__addBtn:active {
-  transform: translate(var(--shadow-offset), var(--shadow-offset));
-  box-shadow: none;
+  background: var(--color-surface-container-low);
+  color: var(--color-on-surface);
 }
 
 .table__addBtn:focus-visible {
   outline: 4px solid var(--color-secondary);
-  outline-offset: 2px;
+  outline-offset: -2px;
 }
 
 /* ── Grid ───────────────────────────────────────────────────── */
@@ -94,12 +94,30 @@
   table-layout: auto;
 }
 
+.table__headRow {
+  background: var(--color-brand-black);
+}
+
 .table__row {
-  border-bottom: var(--border-width) solid var(--border-color);
+  border-bottom: 1px solid var(--color-outline-variant);
 }
 
 .table__row:last-child {
   border-bottom: none;
+}
+
+.table__row--vencido {
+  background: #fff0f0;
+  border-left: 4px solid var(--color-brand-red);
+}
+
+.table__row--pagado {
+  background: #f0fff4;
+  border-left: 4px solid #2d6a4f;
+}
+
+.table__row--pendiente {
+  background: transparent;
 }
 
 .table__th {
@@ -109,10 +127,9 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--color-on-surface-variant);
-  background: var(--color-surface-container-low);
+  color: var(--color-surface-container-lowest);
+  background: var(--color-brand-black);
   text-align: left;
-  border-bottom: var(--border-width) solid var(--border-color);
   white-space: nowrap;
 }
 
@@ -131,6 +148,32 @@
   padding: 0;
 }
 
+.table__name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.table__expandBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 10px;
+  color: var(--color-on-surface-variant);
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.table__expandBtn:focus-visible {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 1px;
+}
+
 .table__empty {
   padding: var(--space-8) var(--space-4);
   text-align: center;
@@ -140,7 +183,7 @@
   font-style: italic;
 }
 
-/* ── Paid/Unpaid badge ──────────────────────────────────────── */
+/* ── Status badges ──────────────────────────────────────────── */
 
 .badge {
   display: inline-flex;
@@ -148,22 +191,27 @@
   gap: var(--space-1);
   padding: 2px var(--space-2);
   font-family: var(--font-body);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  border: 2px solid var(--border-color);
+  border: 2px solid currentColor;
+  border-radius: 0;
 }
 
-.badge--paid {
-  background: var(--color-brand-black);
-  color: var(--color-surface-container-lowest);
+.badge--pendiente {
+  background: var(--color-surface-container-low);
+  color: var(--color-on-surface-variant);
 }
 
-.badge--unpaid {
-  background: var(--color-surface-container-lowest);
+.badge--vencido {
+  background: #fff0f0;
   color: var(--color-brand-red);
-  border-color: var(--color-brand-red);
+}
+
+.badge--pagado {
+  background: #f0fff4;
+  color: #2d6a4f;
 }
 
 /* ── Kebab menu ─────────────────────────────────────────────── */
