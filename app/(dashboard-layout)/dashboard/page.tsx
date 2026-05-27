@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import styles from "./page.module.css";
 import { createOperation } from "./actions";
-import { logout } from "../actions";
 import { UserData, UserInfo } from "@/types/user";
 
 const initialUser: UserInfo = {
@@ -58,9 +57,6 @@ const Dashboard = async () => {
         Hello {currentUser.first_name} {currentUser.last_name}
       </h1>
       <p>Registered email: {data.user.email}</p>
-      <form action={logout}>
-        <button type="submit">Log out</button>
-      </form>
 
       <h2 className="color-base-purple">Dashboard</h2>
       <form action={createOperation}>
