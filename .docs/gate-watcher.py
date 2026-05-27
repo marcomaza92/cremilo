@@ -355,6 +355,54 @@ def check_review_approved(linear_id: str) -> tuple[bool, list[str]]:
         return False, [f"error fetching comments: {e}"]
 
 
+def _is_pending_in_queue(spawn_key: str) -> bool:
+    """True if spawn_key exists in pending-agents.json with status != 'done'."""
+    if not PENDING_AGENTS.exists():
+        return False
+    try:
+        pending = json.loads(PENDING_AGENTS.read_text())
+        return any(t.get("task_id") == spawn_key and t.get("status") != "done" for t in pending)
+    except Exception:
+        return False
+
+
+REJECTION_KEYWORDS = ("❌", "rework", "rejected", "changes requested", "not approved")
+
+
+def has_rejection_signal(linear_id: str) -> bool:
+    """
+    Returns True if the issue's comment history shows a real design rejection:
+    - any comment contains explicit rejection keywords, OR
+    - the latest review comment has unticked checklist items.
+    Returns False for clean-reset transitions (all boxes ticked, no keywords).
+    Fails open: if comments can't be fetched, assumes rejection to avoid silently
+    dropping a real rework request.
+    """
+    try:
+        data = _gql("""
+            query($id: String!) {
+              issue(id: $id) {
+                comments { nodes { body createdAt } }
+              }
+            }
+        """, {"id": linear_id})
+        nodes = (data.get("data") or {}).get("issue", {}).get("comments", {}).get("nodes", [])
+        if not nodes:
+            return False
+        for c in nodes:
+            body = (c.get("body") or "").lower()
+            if any(kw in body for kw in REJECTION_KEYWORDS):
+                return True
+        for c in sorted(nodes, key=lambda x: x.get("createdAt", ""), reverse=True):
+            body = c.get("body", "") or ""
+            if all(m in body for m in REVIEW_SECTION_MARKERS):
+                return "- [ ]" in body
+        return False
+    except Exception as e:
+        log(f"  WARN: could not check rejection signal for {linear_id} — {e}")
+        return True  # fail open
+
+
 def get_status(linear_id: str, issues: list[dict]) -> str | None:
     for issue in issues:
         if issue.get("id") == linear_id:
@@ -739,12 +787,20 @@ def run_cycle():
 
     # ── Design feedback → re-queue design agent ──────────────────────────────
     # Triggered when a design issue is sent back from In Review → In Progress or Todo.
-    # A fresh design agent is queued with all Linear comments injected into the prompt.
-    # Uses a timestamp-based spawn key so multiple feedback rounds each get their own task.
+    # Two guards prevent false-positive redesign queuing on clean-reset transitions:
+    #   (b) skip if the initial gate0-design task has never run or is still pending
+    #   (a) skip if no explicit rejection signal exists in Linear comments
     for d_key, d_lid, d_screen, d_detail in DESIGN_ISSUES:
         prev = state.get(d_key)
         curr = st(d_key)
         if prev == "In Review" and curr in ("In Progress", "Todo"):
+            initial_key = f"gate0-design-{d_key.lower()}"
+            if initial_key not in state.get("spawned", []) or _is_pending_in_queue(initial_key):
+                log(f"  ⏭️  {d_key} → {curr}: initial design not yet delivered — skipping redesign")
+                continue
+            if not has_rejection_signal(d_lid):
+                log(f"  ⏭️  {d_key} → {curr}: no rejection signal in comments — treating as clean reset")
+                continue
             redesign_key = f"redesign-{d_key.lower()}-{datetime.now().strftime('%Y%m%d%H%M')}"
             log(f"  🔄 {d_key} sent back for rework ({prev} → {curr}) — queuing redesign")
             spawn_agent(
