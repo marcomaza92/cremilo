@@ -22,7 +22,11 @@ Use this skill when generating UI/UX designs for the Cremilo project using Stitc
 
 1. Read the unit description from the Linear issue
 2. Read `.prds/0001-monthly-calculator/DESIGN.md` for the style guidelines AND the Design Rubric
-3. Generate the screen at all three resolutions (320px, 820px, 1440px). For form screens, generate the **error** and **filled-but-not-submitted** replicas in the same pass — never wait for the reviewer to ask
+3. **Screen generation — idempotent, two-phase:**
+   - **Phase 1 — ensure screens exist.** Call `mcp__stitch__list_screens` first. For each required resolution (320px, 820px, 1440px) and replica (error, filled), check if a screen whose title contains both `[D-XX]` and the resolution already exists. If it does, record its URL and skip `generate_screen_from_text` for that slot.
+   - For any slot not yet covered, call `mcp__stitch__generate_screen_from_text`. Always prefix the screen title with `[D-XX]` and include the resolution (e.g. `[D-04] DataTable Tablet 820px`). If the call times out, **immediately call `list_screens` again** — Stitch generates server-side even when the MCP returns a timeout, and the screen will be present. Do not count a timeout as a failure until `list_screens` confirms the screen is absent.
+   - For form screens, generate the **error** and **filled-but-not-submitted** replicas in the same pass — never wait for the reviewer to ask.
+   - **Phase 2 — verify all slots are filled.** After Phase 1, confirm every required URL is recorded. Only call self-check and post the In-Review comment once all slots are accounted for.
 4. Run the **Rubric self-check loop** (see below)
 5. Post the **In-Review comment** (see template below) — URLs live in the comment body only; do NOT create Linear attachments
 6. Move the Linear issue to `In Review`
