@@ -268,7 +268,7 @@ def attach_screens_on_approval(linear_id: str) -> int:
         for line in latest_body.split("\n"):
             stripped = line.strip()
             if stripped.startswith("### ") and not stripped.startswith("#### "):
-                in_section = "Screens delivered" in stripped
+                in_section = "screens delivered" in stripped.lower()
                 continue
             if not in_section or "|" not in stripped:
                 continue
