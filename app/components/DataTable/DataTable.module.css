@@ -201,18 +201,21 @@
 }
 
 .badge--pendiente {
-  background: var(--color-surface-container-low);
-  color: var(--color-on-surface-variant);
+  background: var(--color-brand-yellow);
+  color: var(--color-brand-black);
+  border-color: var(--color-brand-black);
 }
 
 .badge--vencido {
-  background: #fff0f0;
-  color: var(--color-brand-red);
+  background: var(--color-brand-red);
+  color: #ffffff;
+  border-color: var(--color-brand-red);
 }
 
 .badge--pagado {
-  background: #f0fff4;
-  color: #2d6a4f;
+  background: #2d6a4f;
+  color: #ffffff;
+  border-color: #2d6a4f;
 }
 
 /* ── Kebab menu ─────────────────────────────────────────────── */
