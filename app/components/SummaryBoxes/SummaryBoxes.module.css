@@ -1,0 +1,84 @@
+/* Summary Boxes — three-card strip above the fold */
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+/* tablet (820px+) and desktop: single row of 3 */
+@media (min-width: 820px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ── Card base ─────────────────────────────────────────────────────── */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-6);
+  background: var(--color-surface-container-lowest);
+  border: var(--border-width) solid var(--border-color);
+  box-shadow: var(--shadow);
+  min-height: 120px;
+}
+
+/* ── Accent top border per variant ─────────────────────────────────── */
+.card--income {
+  border-top: 6px solid var(--color-brand-blue);
+}
+
+.card--outcome {
+  border-top: 6px solid var(--color-brand-red);
+}
+
+.card--remaining {
+  border-top: 6px solid var(--color-brand-yellow);
+}
+
+/* ── Skeleton loading state ─────────────────────────────────────────── */
+.card--skeleton {
+  background: var(--color-surface-container-high);
+  border-color: var(--color-surface-container-highest);
+  box-shadow: none;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+/* ── Card internals ─────────────────────────────────────────────────── */
+.card__title {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-on-surface-variant);
+  margin: 0;
+}
+
+.card__amount {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-on-surface);
+  margin: 0;
+  /* prevent overflow on small viewports */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card__currency {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--color-on-surface-variant);
+  margin: 0;
+}
