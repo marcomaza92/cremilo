@@ -95,7 +95,8 @@
 }
 
 .table__headRow {
-  background: var(--color-brand-black);
+  background: var(--color-surface-container-low);
+  border-bottom: var(--border-width) solid var(--border-color);
 }
 
 .table__row {
@@ -127,8 +128,8 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--color-surface-container-lowest);
-  background: var(--color-brand-black);
+  color: var(--color-on-surface-variant);
+  background: var(--color-surface-container-low);
   text-align: left;
   white-space: nowrap;
 }
