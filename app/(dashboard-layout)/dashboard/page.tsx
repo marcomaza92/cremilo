@@ -4,6 +4,7 @@ import styles from "./page.module.css";
 import { createOperation } from "./actions";
 import { UserData, UserInfo } from "@/types/user";
 import ExpensesSection from "./ExpensesSection";
+import GastosFijosSection from "./GastosFijosSection";
 import IngresosSection from "./IngresosSection";
 
 const initialUser: UserInfo = {
@@ -64,6 +65,7 @@ const Dashboard = async () => {
 
       <main className={styles.page__content}>
         <IngresosSection />
+        <GastosFijosSection />
         <ExpensesSection />
       </main>
     </div>
