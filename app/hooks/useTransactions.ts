@@ -89,7 +89,9 @@ export function useTransactions(section: Section) {
       );
       await supabase.from("transactions").update(patch).eq("id", id);
     } else {
+      const { data: { user } } = await supabase.auth.getUser();
       const insert = {
+        user_id: user!.id,
         section,
         name: data.name,
         amount: data.amount,
