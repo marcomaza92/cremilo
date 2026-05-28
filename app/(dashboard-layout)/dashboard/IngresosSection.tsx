@@ -1,67 +1,21 @@
 "use client";
 
-import { useState } from "react";
-import DataTable, { DataTableRow } from "@/app/components/DataTable/DataTable";
-import ItemForm, { ItemFormData } from "@/app/components/ItemForm";
-
-const STUB_ROWS: DataTableRow[] = [
-  {
-    id: "i-1",
-    name: "Sueldo",
-    amount: 450000,
-    currency: "ARS",
-    dueDate: "2026-05-31",
-    status: "Pagado",
-  },
-  {
-    id: "i-2",
-    name: "Freelance",
-    amount: 120000,
-    currency: "ARS",
-    dueDate: "2026-05-15",
-    status: "Pendiente",
-  },
-];
-
-type FormMode = { type: "add" } | { type: "edit"; id: string } | null;
+import DataTable from "@/app/components/DataTable/DataTable";
+import ItemForm from "@/app/components/ItemForm";
+import { useIngresos } from "@/app/hooks/useIngresos";
 
 export default function IngresosSection() {
-  const [formMode, setFormMode] = useState<FormMode>(null);
-
-  function handleAdd() {
-    setFormMode({ type: "add" });
-  }
-
-  function handleEdit(id: string) {
-    setFormMode({ type: "edit", id });
-  }
-
-  function handleDelete(id: string) {
-    console.log("delete", id);
-  }
-
-  function handleSave(data: ItemFormData) {
-    console.log("save", data);
-    setFormMode(null);
-  }
-
-  function handleCancel() {
-    setFormMode(null);
-  }
-
-  const editItem =
-    formMode?.type === "edit"
-      ? STUB_ROWS.find((r) => r.id === formMode.id)
-      : undefined;
+  const { rows, formMode, editItem, openAdd, openEdit, remove, save, cancel } =
+    useIngresos();
 
   return (
     <>
       <DataTable
         title="Ingresos"
-        rows={STUB_ROWS}
-        onAdd={handleAdd}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
+        rows={rows}
+        onAdd={openAdd}
+        onEdit={openEdit}
+        onDelete={remove}
       />
 
       {formMode && (
@@ -79,8 +33,8 @@ export default function IngresosSection() {
               : undefined
           }
           globalRate={1200}
-          onSave={handleSave}
-          onCancel={handleCancel}
+          onSave={save}
+          onCancel={cancel}
         />
       )}
     </>
