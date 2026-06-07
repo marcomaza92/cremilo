@@ -1,3 +1,60 @@
-.container {
-  padding: 2rem;
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-6);
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.page__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.page__title {
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-on-surface);
+  margin: 0;
+}
+
+.page__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.page__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.page__sectionTitle {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-on-surface);
+  margin: 0;
+}
+
+/* Deep-link row highlight animation — applied/removed by useConfigDeepLink */
+:global(.config-row--highlighted) {
+  animation: rowHighlight 1s ease-out forwards;
+}
+
+@keyframes rowHighlight {
+  0% {
+    background-color: var(--color-primary-container, #fffde7);
+  }
+  100% {
+    background-color: transparent;
+  }
 }
