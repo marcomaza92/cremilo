@@ -45,16 +45,3 @@
   margin: 0;
 }
 
-/* Deep-link row highlight animation — applied/removed by useConfigDeepLink */
-:global(.config-row--highlighted) {
-  animation: rowHighlight 1s ease-out forwards;
-}
-
-@keyframes rowHighlight {
-  0% {
-    background-color: var(--color-primary-container, #fffde7);
-  }
-  100% {
-    background-color: transparent;
-  }
-}

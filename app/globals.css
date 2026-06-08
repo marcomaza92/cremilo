@@ -133,3 +133,16 @@ button {
   white-space: nowrap;
   border: 0;
 }
+
+.config-row--highlighted {
+  animation: rowHighlight 1s ease-out forwards;
+}
+
+@keyframes rowHighlight {
+  0% {
+    background-color: var(--color-primary-container, #fffde7);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
