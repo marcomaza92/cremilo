@@ -22,13 +22,23 @@ from pathlib import Path
 
 PROJECT_DIR    = Path(__file__).parent.parent
 MAP_FILE       = Path(__file__).parent / "gate-watcher-map.json"
+CONFIG_FILE    = Path(__file__).parent / "gate-watcher-config.json"
 LOG_FILE       = Path(__file__).parent / "gate-watcher.log"
 STATE_FILE     = Path("/tmp/gate-watcher-state.json")
 AGENT_LOGS     = Path(__file__).parent / "agent-logs"
 SKILLS_DIR     = PROJECT_DIR / ".claude" / "skills"
 PENDING_AGENTS = Path(__file__).parent / "pending-agents.json"
-PRD_FILE     = PROJECT_DIR / ".prds" / "0001-monthly-calculator" / "PRD.md"
-DESIGN_FILE  = PROJECT_DIR / ".prds" / "0001-monthly-calculator" / "DESIGN.md"
+DESIGN_FILE    = PROJECT_DIR / "DESIGN.md"
+
+# ── Sub-app config ────────────────────────────────────────────────────────────
+
+def _load_config() -> dict:
+    if not CONFIG_FILE.exists():
+        log(f"ERROR: {CONFIG_FILE} not found — create it for the active sub-app")
+        sys.exit(1)
+    return json.loads(CONFIG_FILE.read_text())
+
+cfg = _load_config()
 
 # ── Linear API ────────────────────────────────────────────────────────────────
 
@@ -109,14 +119,15 @@ def read_skill(skill_name: str) -> str:
 
 def spawn_agent(skill_name: str, spawn_key: str, task_prompt: str, state: dict):
     """
-    Queue an agent task by writing to pending-agents.json.
-    The Gate Watcher SKILL.md reads this file after each Python run and
-    creates a one-time scheduled task for each entry — giving the agent a
-    full Claude session with proper auth and MCP access.
-    spawn_key is tracked in state so each agent is queued only once.
+    Autonomously spawn a claude -p session for the given agent task.
+    Uses subprocess.Popen (non-blocking) so gate-watcher continues polling
+    while the agent runs in the background.
+
+    Falls back to pending-agents.json queue if the claude CLI is not found.
+    spawn_key is tracked in state so each agent is spawned only once.
     """
     if spawn_key in state.get("spawned", []):
-        return  # already queued or run
+        return  # already spawned or queued
 
     skill = read_skill(skill_name)
     full_prompt = (
@@ -124,34 +135,53 @@ def spawn_agent(skill_name: str, spawn_key: str, task_prompt: str, state: dict):
         if skill else task_prompt
     )
 
-    # Load existing pending list
-    pending: list[dict] = []
-    if PENDING_AGENTS.exists():
-        try:
-            pending = json.loads(PENDING_AGENTS.read_text())
-        except Exception:
-            pending = []
+    AGENT_LOGS.mkdir(exist_ok=True)
+    log_path = AGENT_LOGS / f"{spawn_key}.log"
 
-    # Append new entry
-    pending.append({
-        "task_id": spawn_key,
-        "type": skill_name,
-        "description": f"{skill_name} — {spawn_key}",
-        "prompt": full_prompt,
-        "status": "pending",
-        "queued_at": datetime.now().isoformat(),
-    })
-    PENDING_AGENTS.write_text(json.dumps(pending, indent=2))
+    try:
+        import shutil
+        claude_bin = shutil.which("claude")
+        if not claude_bin:
+            raise FileNotFoundError("claude CLI not found")
 
-    log(f"  📋 Queued {skill_name} [{spawn_key}] → pending-agents.json")
+        with open(log_path, "w") as log_f:
+            proc = subprocess.Popen(
+                [claude_bin, "-p", full_prompt, "--dangerously-skip-permissions"],
+                stdout=log_f,
+                stderr=log_f,
+                cwd=str(PROJECT_DIR),
+                env={**os.environ, "CLAUDE_USAGE_SKIP": "1"},
+            )
+        log(f"  🚀 Spawned {skill_name} [{spawn_key}] PID={proc.pid} → {log_path.name}")
+
+    except Exception as e:
+        # Fallback: write to pending-agents.json for manual pickup
+        log(f"  ⚠️  claude CLI spawn failed ({e}) — falling back to pending-agents.json")
+        pending: list[dict] = []
+        if PENDING_AGENTS.exists():
+            try:
+                pending = json.loads(PENDING_AGENTS.read_text())
+            except Exception:
+                pending = []
+        pending.append({
+            "task_id": spawn_key,
+            "type": skill_name,
+            "description": f"{skill_name} — {spawn_key}",
+            "prompt": full_prompt,
+            "status": "pending",
+            "queued_at": datetime.now().isoformat(),
+        })
+        PENDING_AGENTS.write_text(json.dumps(pending, indent=2))
+        log(f"  📋 Queued {skill_name} [{spawn_key}] → pending-agents.json (manual pickup needed)")
+
     state.setdefault("spawned", []).append(spawn_key)
 
 
 # ── Linear helpers ────────────────────────────────────────────────────────────
 
-# Team + project IDs (Cremilo / Monthly Calculator)
+# Team + project IDs (team is fixed; project comes from active sub-app config)
 _TEAM_ID    = "5c088e06-e8e8-4311-9da8-19c178bbbba7"
-_PROJECT_ID = "e4bb212a-8e3f-4f64-bdd0-18c4b256b8ed"
+_PROJECT_ID = cfg["project_id"]
 
 
 def fetch_issues() -> list[dict]:
@@ -355,6 +385,307 @@ def check_review_approved(linear_id: str) -> tuple[bool, list[str]]:
         return False, [f"error fetching comments: {e}"]
 
 
+# ── Slash command helpers ─────────────────────────────────────────────────────
+
+def post_linear_comment(linear_id: str, body: str) -> bool:
+    """Post a comment on a Linear issue. Returns True on success."""
+    try:
+        issue_data = _gql("query($id: String!) { issue(id: $id) { id } }", {"id": linear_id})
+        issue_uuid = (issue_data.get("data") or {}).get("issue", {}).get("id")
+        if not issue_uuid:
+            return False
+        _gql("""
+            mutation($issueId: String!, $body: String!) {
+              commentCreate(input: { issueId: $issueId, body: $body }) {
+                success
+              }
+            }
+        """, {"issueId": issue_uuid, "body": body})
+        return True
+    except Exception as e:
+        log(f"  WARN: could not post comment on {linear_id} — {e}")
+        return False
+
+
+def get_latest_slash_command(linear_id: str) -> tuple[str | None, str]:
+    """
+    Return (command, args) if the latest comment is a slash command, else (None, '').
+    Recognized commands: approve, promote, redesign.
+    """
+    try:
+        data = _gql("""
+            query($id: String!) {
+              issue(id: $id) {
+                comments { nodes { body createdAt } }
+              }
+            }
+        """, {"id": linear_id})
+        nodes = (data.get("data") or {}).get("issue", {}).get("comments", {}).get("nodes", [])
+        if not nodes:
+            return None, ""
+        latest = sorted(nodes, key=lambda x: x.get("createdAt", ""), reverse=True)[0]
+        body = (latest.get("body") or "").strip()
+        for cmd in ("approve", "promote", "redesign"):
+            prefix = f"/{cmd}"
+            if body == prefix:
+                return cmd, ""
+            if body.startswith(prefix + "\n") or body.startswith(prefix + " "):
+                return cmd, body[len(prefix):].strip()
+        return None, ""
+    except Exception as e:
+        log(f"  WARN: could not fetch latest slash command for {linear_id} — {e}")
+        return None, ""
+
+
+def _parse_screens_table(body: str) -> list[tuple[str, str, str, str]]:
+    """
+    Parse the 'Screens delivered' table from a comment body.
+    Returns list of (resolution, initial_url, error_url, filled_url).
+    URLs are empty strings when n/a.
+    """
+    rows: list[tuple[str, str, str, str]] = []
+    in_section = False
+    for line in body.split("\n"):
+        stripped = line.strip()
+        if stripped.startswith("### ") and not stripped.startswith("#### "):
+            in_section = "screens delivered" in stripped.lower()
+            continue
+        if not in_section or "|" not in stripped:
+            continue
+        cells = [c.strip() for c in stripped.split("|")]
+        if len(cells) < 6:
+            continue
+        resolution = cells[1]
+        if not resolution or resolution.lower().startswith(("---", "resolution")):
+            continue
+        initial = _extract_url(cells[2]) or ""
+        error   = _extract_url(cells[3]) or ""
+        filled  = _extract_url(cells[4]) or ""
+        rows.append((resolution, initial, error, filled))
+    return rows
+
+
+def get_latest_delivery_comment(linear_id: str) -> tuple[int, str | None]:
+    """
+    Return (version_count, latest_delivery_body) where version_count is the number
+    of comments containing 'Screens delivered - v' and latest_delivery_body is the
+    most recent such comment's body, or None if none exist.
+    """
+    try:
+        data = _gql("""
+            query($id: String!) {
+              issue(id: $id) {
+                comments { nodes { body createdAt } }
+              }
+            }
+        """, {"id": linear_id})
+        nodes = (data.get("data") or {}).get("issue", {}).get("comments", {}).get("nodes", [])
+        delivery = [c for c in nodes if "Screens delivered - v" in (c.get("body") or "")]
+        if not delivery:
+            return 0, None
+        latest = sorted(delivery, key=lambda x: x.get("createdAt", ""), reverse=True)[0]
+        return len(delivery), latest.get("body")
+    except Exception as e:
+        log(f"  WARN: could not fetch delivery comments for {linear_id} — {e}")
+        return 0, None
+
+
+def handle_slash_promote(d_key: str, d_lid: str):
+    """
+    /promote: parse the latest delivery comment, then post the formal review comment
+    with both checklists unticked. Does not change issue status.
+    """
+    version_count, delivery_body = get_latest_delivery_comment(d_lid)
+    if not delivery_body:
+        post_linear_comment(
+            d_lid,
+            '❌ `/promote` failed — no "Screens delivered" comment found. '
+            "The design agent must deliver screens first.",
+        )
+        log(f"  ⚠️  {d_key} /promote: no delivery comment found")
+        return
+
+    rows = _parse_screens_table(delivery_body)
+    if not rows:
+        post_linear_comment(
+            d_lid,
+            "❌ `/promote` failed — could not parse the Screens delivered table. "
+            "Check the latest delivery comment format.",
+        )
+        log(f"  ⚠️  {d_key} /promote: could not parse screens table")
+        return
+
+    all_urls = [u for _, i, e, f in rows for u in (i, e, f) if u]
+    rep_url = all_urls[0] if all_urls else "(see screens above)"
+
+    def fmt_url(u: str) -> str:
+        return u if u else "n/a"
+
+    table_lines = "\n".join(
+        f"| {res} | {fmt_url(ini)} | {fmt_url(err)} | {fmt_url(fil)} |"
+        for res, ini, err, fil in rows
+    )
+
+    body = f"""✅ Design submitted for review — {d_key}
+
+### Screens delivered - v{version_count}
+
+| Resolution | Initial | Error replica | Filled replica |
+|---|---|---|---|
+{table_lines}
+
+### Accessibility review checklist
+
+**Human reviewer: tick every box before posting `/approve`. Gate-watcher blocks downstream propagation until both checklists are fully ticked.**
+
+- [ ] **6. Color contrast** — verified at: {rep_url}
+- [ ] **7. ARIA labels** — verified at: {rep_url}
+- [ ] **8. Color-independent state** — verified at: {rep_url}
+- [ ] **9. Target size 48×48** — verified at: {rep_url}
+
+### Manual review checklist
+
+**Human reviewer: tick every box before posting `/approve`. Gate-watcher blocks downstream propagation until both checklists are fully ticked.**
+
+- [ ] **2. Above-the-fold information** — verified at: {rep_url}
+- [ ] **4. Currency display** — verified at: {rep_url}
+- [ ] **5. Action distance** — verified at: {rep_url}
+
+---
+👉 Tick every box in BOTH checklists, then post `/approve` to move to Done and unblock development."""
+
+    if post_linear_comment(d_lid, body):
+        log(f"  📋 {d_key} /promote → posted formal review comment (v{version_count})")
+    else:
+        log(f"  ⚠️  {d_key} /promote → failed to post review comment")
+
+
+def handle_slash_approve(
+    d_key: str, d_lid: str,
+    design_dev_map: dict, m: dict, issues: list[dict], state: dict,
+):
+    """
+    /approve: validate both checklists are fully ticked, attach screens, move D-XX
+    to Done, and propagate DEV-XX to Todo if deps are met.
+    """
+    approved, unchecked = check_review_approved(d_lid)
+
+    if not approved:
+        if len(unchecked) == 1 and "No comment found" in unchecked[0]:
+            msg = (
+                "❌ `/approve` failed — no review checklist found. "
+                "Post `/promote` first to generate the review checklist."
+            )
+        else:
+            items = "\n".join(f"- {item}" for item in unchecked)
+            msg = (
+                f"❌ `/approve` failed — {len(unchecked)} checklist item(s) not yet ticked:\n\n"
+                f"{items}\n\nTick all boxes and post `/approve` again."
+            )
+        post_linear_comment(d_lid, msg)
+        log(f"  ⚠️  {d_key} /approve blocked — {len(unchecked)} unchecked item(s)")
+        return
+
+    n = attach_screens_on_approval(d_lid)
+    if n:
+        log(f"  📎 {d_key} /approve → attached {n} screen(s)")
+
+    set_status(d_lid, d_key, "Done", "/approve — all review checklists verified")
+
+    if d_key in design_dev_map:
+        dev_key, deps = design_dev_map[d_key]
+        if m.get(dev_key):
+            pending_deps = [d for d in deps if get_status(m.get(d, ""), issues) != "Done"]
+            if pending_deps:
+                log(f"  ⏳ {dev_key} waiting on deps: {pending_deps}")
+            elif get_status(m[dev_key], issues) == "Backlog":
+                set_status(m[dev_key], dev_key, "Todo",
+                           f"{d_key} approved via /approve + deps met")
+
+
+def handle_slash_redesign(
+    d_key: str, d_lid: str, d_screen: str, d_detail: str,
+    redesign_prompt: str, state: dict,
+):
+    """
+    /redesign <prompt>: move D-XX to In Progress and spawn design-agent to apply
+    the prompt via edit_screens (GEMINI_3_1_PRO). The agent posts 'Screens delivered - v{N}'
+    (table only) and moves back to In Review.
+    """
+    if not redesign_prompt:
+        post_linear_comment(
+            d_lid,
+            "❌ `/redesign` requires a prompt. Usage:\n```\n/redesign\nYour detailed redesign instructions here.\n```",
+        )
+        log(f"  ⚠️  {d_key} /redesign: empty prompt — skipping")
+        return
+
+    version_count, delivery_body = get_latest_delivery_comment(d_lid)
+    next_version = version_count + 1
+
+    current_screens_section = ""
+    if delivery_body:
+        rows = _parse_screens_table(delivery_body)
+        if rows:
+            lines = ["Current screen URLs (to edit with edit_screens):"]
+            for res, ini, err, fil in rows:
+                if ini:
+                    lines.append(f"  - {res} Initial: {ini}")
+                if err:
+                    lines.append(f"  - {res} Error replica: {err}")
+                if fil:
+                    lines.append(f"  - {res} Filled replica: {fil}")
+            current_screens_section = "\n".join(lines)
+
+    redesign_key = f"slash-redesign-{d_key.lower()}-{datetime.now().strftime('%Y%m%d%H%M')}"
+    set_status(d_lid, d_key, "In Progress", "/redesign command — spawning design-agent")
+
+    task_prompt = f"""
+You are handling a /redesign command for design issue {d_key} ({d_lid}).
+
+Screen: {d_screen}
+{d_detail}
+
+REDESIGN PROMPT (from human reviewer):
+{redesign_prompt}
+
+{current_screens_section}
+
+Steps:
+1. For each screen listed above, extract the screen ID from its URL and call
+   mcp__stitch__edit_screens with model: "GEMINI_3_1_PRO" and the redesign prompt.
+2. After each edit, call mcp__stitch__get_screen to verify that htmlCode.name changed
+   from before the edit. If unchanged, note the failure — do not retry more than once
+   per screen.
+3. Post a comment on {d_lid} using mcp__linear-server__save_comment with this exact format:
+
+🔄 Screens redesigned — {d_key}
+
+### Screens delivered - v{next_version}
+
+| Resolution | Initial | Error replica | Filled replica |
+|---|---|---|---|
+| 390 (mobile) | {{updated url or same url if edit failed}} | {{url or n/a}} | {{url or n/a}} |
+| 768 (tablet) | {{updated url or same url if edit failed}} | {{url or n/a}} | {{url or n/a}} |
+| 1280 (desktop) | {{updated url or same url if edit failed}} | {{url or n/a}} | {{url or n/a}} |
+
+If any screen did not update, append: ⚠️ {{resolution}} — edit did not persist; screen unchanged.
+
+---
+👉 Reviewer: post `/redesign <prompt>` to refine further, or `/promote` when satisfied to start formal review.
+
+4. Move {d_lid} back to 'In Review' with priority 2 (High) using mcp__linear-server__save_issue.
+
+CRITICAL:
+- Use model: "GEMINI_3_1_PRO" for all edit_screens calls — never GEMINI_3_PRO.
+- Do NOT post checklists — only the Screens delivered table.
+- Do NOT self-approve. Move to In Review, not Done.
+""".strip()
+
+    spawn_agent("design-agent", redesign_key, task_prompt, state)
+    log(f"  🔄 {d_key} /redesign → spawned design-agent [{redesign_key}] for v{next_version}")
+
+
 def _is_pending_in_queue(spawn_key: str) -> bool:
     """True if spawn_key exists in pending-agents.json with status != 'done'."""
     if not PENDING_AGENTS.exists():
@@ -401,6 +732,59 @@ def has_rejection_signal(linear_id: str) -> bool:
     except Exception as e:
         log(f"  WARN: could not check rejection signal for {linear_id} — {e}")
         return True  # fail open
+
+
+def _get_github_pr_url(linear_id: str) -> str | None:
+    """Return the first GitHub PR URL attached to the given Linear issue, or None."""
+    try:
+        data = _gql("""
+            query($id: String!) {
+              issue(id: $id) {
+                attachments { nodes { url } }
+              }
+            }
+        """, {"id": linear_id})
+        nodes = (data.get("data") or {}).get("issue", {}).get("attachments", {}).get("nodes", [])
+        for node in nodes:
+            url = node.get("url", "")
+            if "github.com" in url and "/pull/" in url:
+                return url
+        return None
+    except Exception as e:
+        log(f"  WARN: could not fetch attachments for {linear_id} — {e}")
+        return None
+
+
+def propagate_merged_prs(issues: list[dict], issue_map: dict) -> int:
+    """
+    For every tracked issue currently 'In Review', check if its linked GitHub
+    PR has been merged. If so, move the Linear issue to Done.
+    Returns the number of issues propagated.
+    """
+    reverse_map = {v: k for k, v in issue_map.items()}
+    in_review = [i for i in issues if i.get("status") == "In Review" and i["id"] in reverse_map]
+    propagated = 0
+    for issue in in_review:
+        lid = issue["id"]
+        key = reverse_map[lid]
+        pr_url = _get_github_pr_url(lid)
+        if not pr_url:
+            continue
+        try:
+            result = subprocess.run(
+                ["gh", "pr", "view", pr_url, "--json", "state,mergedAt"],
+                capture_output=True, text=True, timeout=15,
+            )
+            if result.returncode != 0:
+                continue
+            pr_data = json.loads(result.stdout)
+            if pr_data.get("state") == "MERGED":
+                log(f"  🔀 {key} ({lid}): PR merged on GitHub → Done")
+                set_status(lid, key, "Done", "PR merged on GitHub")
+                propagated += 1
+        except Exception as e:
+            log(f"  WARN: could not check PR for {lid} — {e}")
+    return propagated
 
 
 def get_status(linear_id: str, issues: list[dict]) -> str | None:
@@ -464,105 +848,53 @@ def prompt_design(key: str, linear_id: str, screen: str, details: str) -> str:
     comments = fetch_comments(linear_id)
     feedback_section = f"\n\n{comments}" if comments else ""
     revision_note = (
-        "\n\nThis is a REVISION — address every point in the feedback above before "
-        "moving to In Review.\n"
-        "STITCH LIMITATION: The Stitch MCP cannot delete screens. "
-        "If the feedback asks for deletions, skip them and instead post a Linear comment "
-        "listing the screen URLs to delete, prefixed with "
-        "'🗑️ Manual cleanup needed — please delete these screens from Stitch:'. "
-        "Use mcp__linear-server__save_comment to post the comment."
+        "\n\nThis is a REVISION — address every point in the feedback above before moving to In Review."
         if comments else ""
     )
     return f"""
-Gate 0 has been cleared for the Cremilo Monthly Calculator project.
+Gate 0 has been cleared for the Cremilo {cfg["sub_app"]} sub-app.
 You are working on ONE design issue: {key} ({linear_id}).
 
 Screen: {screen}
 {details}{feedback_section}
 
-Design references (read both before starting):
-- PRD:    {PRD_FILE}
+Design references (read before starting):
+- PTS: {cfg["pts_url"]}
 - DESIGN: {DESIGN_FILE}
 
 Steps:
 1. Read the PRD sections relevant to this screen.
 2. Read DESIGN.md for the Mondrian neobrutalist style rules (palette, typography, borders, shadows).
-3. Use mcp__stitch__* to create or edit the screen. Apply the design system faithfully.
-4. Attach the Stitch screen URL(s) to {linear_id} using mcp__linear-server__save_issue (links field).
-5. Move {linear_id} to 'In Review' with priority 2 (High) using mcp__linear-server__save_issue.
-6. Post a completion comment on {linear_id} using mcp__linear-server__save_comment with this format:
-
-```
-✅ Design complete — ready for review
-
-**Screens delivered:**
-- [list each screen with its Stitch link]
-
-**What was addressed:**
-- [brief bullet list of what was done, e.g. "Fixed color contrast", "Added mobile version"]
-
-🗑️ **Manual cleanup needed — please delete these screens from Stitch:**
-- [list any screens requested for deletion, with links — omit this section if none]
-
----
-👉 Move to **Done** to approve and unblock development, or back to **In Progress** with a comment for revision.
-```
+3. Use mcp__stitch__generate_screen_from_text to create screens at 390px (MOBILE), 768px (TABLET),
+   and 1280px (DESKTOP). Always pass designSystem: "assets/f7ec1a75b48d4b5985962fbe7074ce76".
+   For edits to existing screens, use mcp__stitch__edit_screens with model: "GEMINI_3_1_PRO".
+4. Move {linear_id} to 'In Review' with priority 2 (High) using mcp__linear-server__save_issue.
+5. Post a completion comment on {linear_id} using mcp__linear-server__save_comment following
+   the In-Review comment template in your skill file (Screens delivered - v1 table only).
 
 IMPORTANT:
 - This is your ONLY task — do not work on other design issues.
-- Never mark the issue as Done yourself. Only 'In Review'.
-- If Stitch requires multiple iterations to match the style guide, iterate until it does.
-- The Stitch MCP cannot delete screens — list them in the comment instead.{revision_note}
+- Never mark the issue as Done yourself — only 'In Review'.
+- Follow the In-Review comment template exactly: screens table only, no rubric, no checklists.
+- Run the internal rubric self-check (≤3 iterations) before posting, but do not include the
+  self-check table in the comment.{revision_note}
 """.strip()
 
 
-# Design issue catalogue — key → (linear_id, screen title, extra detail)
+# Design issue catalogue — loaded from gate-watcher-config.json
+# Format per entry: [key, linear_id, screen_title, detail]
 DESIGN_ISSUES: list[tuple[str, str, str, str]] = [
-    ("D-01", "CRE-15", "Auth screens — login + register pages",
-     "Two screens: /login (email + password fields, submit CTA) and /register "
-     "(email, password, confirm password). Include error state for invalid credentials. "
-     "Neobrutalist card layout, thick border input fields."),
-    ("D-02", "CRE-16", "App shell — main layout + navigation sidebar",
-     "Persistent left sidebar with nav links: Ingresos, Gastos Fijos, Tarjetas, Config. "
-     "Active state indicator. Top bar with app title and user avatar/logout. "
-     "Main content area with consistent padding."),
-    ("D-03", "CRE-17", "Calculator sections overview — tab layout for 3 sections",
-     "Tab switcher between Ingresos / Gastos Fijos / Tarjetas inside the main content area. "
-     "Show the selected section's DataTable below the tabs. Empty state for no rows."),
-    ("D-04", "CRE-21", "DataTable component — reusable table with collapse + row actions",
-     "Columns: name, amount (ARS/USD), due date, status. Collapsible rows. "
-     "Kebab (⋮) menu per row: Edit, Delete. Add-row button at the bottom. "
-     "Vencido rows in red tint, Pagado in green tint. Thick borders, hard drop-shadow on table card."),
-    ("D-05", "CRE-22", "ItemForm component — add/edit modal with currency-aware fields",
-     "Modal form with: name (text), amount (number), currency toggle (ARS/USD). "
-     "When USD selected: show FX rate field and ARS equivalent (read-only calculated). "
-     "Due date picker. Save + Cancel buttons. Neobrutalist modal with hard shadow."),
-    ("D-06", "CRE-23", "Tarjetas section — credit card installment view",
-     "Extends DataTable: extra columns for installments paid / total, remaining debt. "
-     "Row status badge: Vencido (red) / Pagado (green) / Al día (neutral). "
-     "Summary card at top showing total monthly card cost in ARS."),
-    ("D-07", "CRE-27", "Config screen — Rates section",
-     "Settings page, Rates sub-section. Shows current USD→ARS exchange rate. "
-     "Input to update it manually. Saved indicator. "
-     "Section header with bold label and divider in neobrutalist style."),
-    ("D-08", "CRE-28", "Config screen — Format section",
-     "Format sub-section below Rates. Options: decimal separator (. or ,), "
-     "currency symbol position (prefix/suffix), date format (DD/MM/YYYY or MM/DD/YYYY). "
-     "Toggle or select controls, consistent with the design system."),
-    ("D-09", "CRE-29", "Config screen — Impuesto de Sellos section",
-     "Toggle to enable/disable the 1.49% Impuesto de Sellos tax. "
-     "When enabled: show calculated tax amount on applicable transactions. "
-     "Explanatory label below the toggle. Matches Config section header style from D-07."),
+    tuple(entry) for entry in cfg.get("design_issues", [])
 ]
 
 
 def prompt_tl_agent() -> str:
     return f"""
-Gate 0 has been cleared for the Cremilo Monthly Calculator project.
-Your job is to complete all 6 infrastructure issues in order.
+Gate 0 has been cleared for the Cremilo {cfg["sub_app"]} sub-app.
+Your job is to complete all infrastructure issues. Query Linear for [I-XX] issues in Todo state, identify which are independent, and execute them in parallel where possible.
 
 Project root: {PROJECT_DIR}
-PRD: {PRD_FILE}
+PTS: {cfg["pts_url"]}
 
 | Key  | Linear | Task |
 |------|--------|------|
@@ -596,8 +928,8 @@ Key constraints:
 
 def prompt_qa_setup() -> str:
     return f"""
-Gate 0 has been cleared for the Cremilo Monthly Calculator project.
-Your job is to complete Q-01 (CRE-20): set up the E2E test framework.
+Gate 0 has been cleared for the Cremilo {cfg["sub_app"]} sub-app.
+Your job is to complete Q-01: set up the E2E test framework.
 
 This is scaffold only — no features exist yet. Just the skeleton.
 
@@ -632,18 +964,12 @@ Linear issue {issue_key} ({linear_id}) has moved to Todo — this is your task.
 {issue_key}: {description}
 
 Project root: {PROJECT_DIR}
-PRD: {PRD_FILE}
+PTS: {cfg["pts_url"]}
 DESIGN: {DESIGN_FILE}
 
 Dependencies already Done: {deps}
 
-Implementation constraints:
-- Next.js 15 App Router (server components where possible, client only when needed)
-- @supabase/ssr for any auth/session work (cookie-based, never localStorage)
-- TanStack Query for all data fetching (useQuery / useMutation)
-- CSS Modules — one .module.css per component file, BEM-like naming
-- nequi design system primitives mapped to CSS Module overrides
-- No Tailwind, no inline styles, no global class names
+Read AGENTS.md and CLAUDE.md for full stack constraints.
 
 When done:
 1. Open a PR with a clear description.
@@ -671,18 +997,12 @@ Linear issue {issue_key} ({linear_id}) has moved to Todo — this is your task.
 {issue_key}: {description}
 
 Project root: {PROJECT_DIR}
-PRD: {PRD_FILE}
+PTS: {cfg["pts_url"]}
 DESIGN: {DESIGN_FILE}
 
 Dependencies already Done: {deps}
 
-Implementation constraints:
-- React component-first — build isolated, reusable components
-- CSS Modules — one .module.css per component, BEM-like naming
-- nequi design system: Stitch design token → nequi primitive → CSS Module override
-- Neobrutalist Mondrian style: thick borders (2-3px solid #000), box-shadow: 4px 4px 0 #000, no border-radius
-- Keyboard accessible — ARIA roles for modals, menus, dropdowns
-- No Tailwind, no inline styles
+Read AGENTS.md and CLAUDE.md for full stack constraints.
 
 When done:
 1. Open a PR with a clear description.
@@ -714,8 +1034,11 @@ Features being tested (now Done): {feature_issues}
 Project root: {PROJECT_DIR}
 Tests dir: {PROJECT_DIR}/tests/e2e/
 
+Production URL: {cfg["prod_url"]}
+Test credentials: read from .env.local
+
 Write Playwright E2E tests for this feature:
-1. Navigate using the Vercel preview URL (read from VERCEL_URL env var).
+1. Navigate using the production URL above. Use the test credentials for any login/register flows.
 2. Cover the happy path and at least one edge case.
 3. Use stable selectors (data-testid, ARIA roles) — no brittle CSS class selectors.
 4. Each assertion must be explicit (no timing-dependent waits).
@@ -764,6 +1087,9 @@ def run_cycle():
 
     actions = 0
 
+    # ── Merged PRs → Done ─────────────────────────────────────────────────────
+    actions += propagate_merged_prs(issues, m)
+
     # ── Gate 0 cleared → spawn Design + TL + QA-setup ────────────────────────
     g0_keys = ["G0-1", "G0-2", "G0-3", "G0-4"]
     if all(is_done(k) for k in g0_keys):
@@ -798,6 +1124,11 @@ def run_cycle():
             if initial_key not in state.get("spawned", []) or _is_pending_in_queue(initial_key):
                 log(f"  ⏭️  {d_key} → {curr}: initial design not yet delivered — skipping redesign")
                 continue
+            # Skip if this In Progress transition was triggered by a /redesign slash command
+            slash_cmd, _ = get_latest_slash_command(d_lid)
+            if slash_cmd == "redesign":
+                log(f"  ⏭️  {d_key} → {curr}: /redesign command in progress — skipping feedback re-queue")
+                continue
             if not has_rejection_signal(d_lid):
                 log(f"  ⏭️  {d_key} → {curr}: no rejection signal in comments — treating as clean reset")
                 continue
@@ -820,16 +1151,9 @@ def run_cycle():
                 actions += 1
 
     # ── Design approvals → move DEV to Todo ──────────────────────────────────
+    # Loaded from gate-watcher-config.json: {"D-01": ["DEV-01", ["I-04"]], ...}
     design_dev_map = {
-        "D-01": ("DEV-01", ["I-04"]),
-        "D-02": ("DEV-02", ["I-03"]),
-        "D-03": ("DEV-03", ["I-05"]),
-        "D-04": ("DEV-04", ["I-06"]),
-        "D-05": ("DEV-05", ["I-06"]),
-        "D-06": ("DEV-06", ["DEV-05"]),
-        "D-07": ("DEV-10", ["I-02"]),
-        "D-08": ("DEV-11", ["I-02"]),
-        "D-09": ("DEV-12", ["DEV-10"]),
+        k: (v[0], v[1]) for k, v in cfg.get("design_dev_map", {}).items()
     }
     for d_key, (dev_key, deps) in design_dev_map.items():
         if is_done(d_key) and st(dev_key) == "Backlog" and m.get(dev_key):
@@ -845,50 +1169,45 @@ def run_cycle():
                        f"{d_key} approved + Accessibility & Manual review verified + deps met")
             actions += 1
 
-    # ── DEV-04 + DEV-05 done → unlock DEV-07, DEV-08 ────────────────────────
-    if is_done("DEV-04") and is_done("DEV-05"):
-        for key in ["DEV-07", "DEV-08"]:
-            if st(key) == "Backlog" and m.get(key):
-                set_status(m[key], key, "Todo", "DEV-04 + DEV-05 done")
-                actions += 1
-
-    # ── DEV-04 + DEV-06 done → unlock DEV-09 ────────────────────────────────
-    if is_done("DEV-04") and is_done("DEV-06"):
-        if st("DEV-09") == "Backlog" and m.get("DEV-09"):
-            set_status(m["DEV-09"], "DEV-09", "Todo", "DEV-04 + DEV-06 done")
+    # ── Slash commands for design issues in In Review ─────────────────────────
+    # Detects /approve, /promote, /redesign in the latest comment of each D-XX
+    # issue that is currently In Review. Each command is idempotent by design:
+    # /promote posts a new comment so the latest comment is no longer /promote;
+    # /approve moves the issue to Done so the next cycle skips it;
+    # /redesign moves the issue to In Progress so the next cycle skips it.
+    for d_key, d_lid, d_screen, d_detail in DESIGN_ISSUES:
+        if st(d_key) != "In Review":
+            continue
+        cmd, args = get_latest_slash_command(d_lid)
+        if not cmd:
+            continue
+        if cmd == "approve":
+            log(f"  🎯 {d_key}: /approve detected")
+            handle_slash_approve(d_key, d_lid, design_dev_map, m, issues, state)
+            actions += 1
+        elif cmd == "promote":
+            log(f"  🎯 {d_key}: /promote detected")
+            handle_slash_promote(d_key, d_lid)
+            actions += 1
+        elif cmd == "redesign":
+            log(f"  🎯 {d_key}: /redesign detected")
+            handle_slash_redesign(d_key, d_lid, d_screen, d_detail, args, state)
             actions += 1
 
+    # ── Multi-dep unlocks → move to Todo ─────────────────────────────────────
+    # Loaded from gate-watcher-config.json: [{"deps": ["DEV-04","DEV-05"], "unlocks": ["DEV-07","DEV-08"]}, ...]
+    for rule in cfg.get("multi_dep_unlocks", []):
+        if all(is_done(d) for d in rule["deps"]):
+            for key in rule["unlocks"]:
+                if st(key) == "Backlog" and m.get(key):
+                    reason = " + ".join(rule["deps"]) + " done"
+                    set_status(m[key], key, "Todo", reason)
+                    actions += 1
+
     # ── DEV issues Todo → spawn FE-A or FE-B ─────────────────────────────────
-    fe_a_issues = {
-        "DEV-01": ("CRE-31", "Implement auth screens (login + register) from approved D-01 design",
-                   "D-01 (design), I-04 (TanStack Query)"),
-        "DEV-02": ("CRE-32", "Implement app shell — main layout, navigation, route groups from D-02",
-                   "D-02 (design), I-03 (auth)"),
-        "DEV-03": ("CRE-33", "Implement calculator section tabs/layout from D-03",
-                   "D-03 (design), I-05 (data schema)"),
-        "DEV-13": ("CRE-43", "Implement financial logic utilities — ROI, installment tracking, Impuesto de Sellos (1.49%), ARS/USD conversion",
-                   "I-05 (data schema)"),
-    }
-    fe_b_issues = {
-        "DEV-04": ("CRE-34", "Build reusable <DataTable /> component — collapse, kebab menu, add-row from D-04",
-                   "D-04 (design), I-06 (nequi audit)"),
-        "DEV-05": ("CRE-35", "Build <ItemForm /> component — currency-aware fields, ARS/USD toggle from D-05",
-                   "D-05 (design), I-06 (nequi audit)"),
-        "DEV-06": ("CRE-36", "Build Tarjetas section — installment tracking, Vencido/Pagado status from D-06",
-                   "D-06 (design), DEV-05 (ItemForm)"),
-        "DEV-07": ("CRE-37", "Build Ingresos section — wire DataTable + ItemForm to useIngresos hook",
-                   "DEV-04, DEV-05 (components)"),
-        "DEV-08": ("CRE-38", "Build Gastos Fijos section — wire DataTable + ItemForm to useGastosFijos hook",
-                   "DEV-04, DEV-05 (components)"),
-        "DEV-09": ("CRE-39", "Build Tarjetas section pages — wire components to useTarjetas hook",
-                   "DEV-04, DEV-06 (components)"),
-        "DEV-10": ("CRE-40", "Build Config — Rates section from D-07",
-                   "D-07 (design), I-02 (Supabase)"),
-        "DEV-11": ("CRE-41", "Build Config — Exchange rate input + persistence from D-08",
-                   "D-08 (design), I-02 (Supabase)"),
-        "DEV-12": ("CRE-42", "Build Config — Impuesto de Sellos toggle from D-09",
-                   "D-09 (design), DEV-10 (Config Rates)"),
-    }
+    # Loaded from gate-watcher-config.json: {"DEV-01": ["CRE-31", "description", "deps"], ...}
+    fe_a_issues = {k: tuple(v) for k, v in cfg.get("fe_a_issues", {}).items()}
+    fe_b_issues = {k: tuple(v) for k, v in cfg.get("fe_b_issues", {}).items()}
 
     for key, (lid, desc, deps) in fe_a_issues.items():
         if is_todo(key) and just_became(key, "Todo"):
@@ -901,62 +1220,57 @@ def run_cycle():
             actions += 1
 
     # ── Dev done → trigger QA issues ─────────────────────────────────────────
-    qa_triggers = {
-        "Q-02": (["DEV-01"],          "CRE-46", "E2E: auth flow — register, login, logout"),
-        "Q-03": (["DEV-04"],          "CRE-47", "E2E: DataTable — collapse, add, edit, delete rows"),
-        "Q-04": (["DEV-05", "DEV-06"],"CRE-48", "E2E: ItemForm — ARS/USD currency switching, Tarjetas form"),
-        "Q-05": (["DEV-13"],          "CRE-49", "E2E: Financial logic — ROI, installments, Impuesto de Sellos"),
-        "Q-06": (["DEV-10", "DEV-11", "DEV-12"], "CRE-50", "E2E: Config screen — rates, exchange rate persistence, tax toggle"),
-    }
+    # Loaded from config: {"Q-02": [["DEV-01"], "CRE-46", "description"], ...}
+    qa_triggers = {k: (v[0], v[1], v[2]) for k, v in cfg.get("qa_triggers", {}).items()}
     for q_key, (deps, lid, desc) in qa_triggers.items():
         if all(is_done(d) for d in deps) and st(q_key) == "Backlog" and m.get(q_key):
             set_status(m[q_key], q_key, "Todo", f"deps done: {deps}")
             actions += 1
 
     # ── QA issues Todo → spawn QA agent ──────────────────────────────────────
-    qa_spawn = {
-        "Q-02": ("CRE-46", "Auth flow — register, login, logout", "DEV-01"),
-        "Q-03": ("CRE-47", "DataTable — collapse, add, edit, delete", "DEV-04"),
-        "Q-04": ("CRE-48", "ItemForm — ARS/USD switch, Tarjetas form", "DEV-05, DEV-06"),
-        "Q-05": ("CRE-49", "Financial logic — ROI, installments, Impuesto de Sellos", "DEV-13"),
-        "Q-06": ("CRE-50", "Config screen — rates, exchange rate, tax toggle", "DEV-10, DEV-11, DEV-12"),
-    }
+    # Loaded from config: {"Q-02": ["CRE-46", "description", "feature_issues"], ...}
+    qa_spawn = {k: tuple(v) for k, v in cfg.get("qa_spawn", {}).items()}
     for q_key, (lid, desc, feat) in qa_spawn.items():
         if is_todo(q_key) and just_became(q_key, "Todo"):
             spawn_agent("qa-agent", f"qa-{q_key.lower()}",
                         prompt_qa_test(q_key, lid, desc, feat), state)
             actions += 1
 
-    # ── All DEV-01–13 done → trigger Q-07 full regression ────────────────────
-    dev_keys = [f"DEV-{i:02d}" for i in range(1, 14)]
-    if all(is_done(k) for k in dev_keys) and st("Q-07") == "Backlog" and m.get("Q-07"):
-        set_status(m["Q-07"], "Q-07", "Todo", "All DEV-01–13 done")
+    # ── All DEV done → trigger full regression ────────────────────────────────
+    regression_key = cfg.get("regression_issue", "Q-07")
+    all_dev_keys   = cfg.get("all_dev_keys", [])
+    staging_key    = cfg.get("staging_issue", "DEV-14")
+    regression_lid = cfg.get("regression_lid", "")
+    staging_lid    = cfg.get("staging_lid", "")
+
+    if all_dev_keys and all(is_done(k) for k in all_dev_keys) and st(regression_key) == "Backlog" and m.get(regression_key):
+        set_status(m[regression_key], regression_key, "Todo", "All DEV issues done")
         actions += 1
 
-    if is_todo("Q-07") and just_became("Q-07", "Todo"):
+    if is_todo(regression_key) and just_became(regression_key, "Todo"):
         spawn_agent(
-            "qa-agent", "qa-q-07",
+            "qa-agent", f"qa-{regression_key.lower()}",
             prompt_qa_test(
-                "Q-07", "CRE-51",
+                regression_key, regression_lid,
                 "Full regression suite — run all E2E tests against staging URL",
-                "DEV-01 through DEV-13 (all features)"
+                ", ".join(all_dev_keys)
             ),
             state,
         )
         actions += 1
 
-    # ── Q-07 done → trigger DEV-14 (staging deploy) ──────────────────────────
-    if is_done("Q-07") and st("DEV-14") == "Backlog" and m.get("DEV-14"):
-        set_status(m["DEV-14"], "DEV-14", "Todo", "Q-07 full regression passed")
+    # ── Regression done → trigger staging deploy ──────────────────────────────
+    if is_done(regression_key) and st(staging_key) == "Backlog" and m.get(staging_key):
+        set_status(m[staging_key], staging_key, "Todo", f"{regression_key} full regression passed")
         actions += 1
 
-    if is_todo("DEV-14") and just_became("DEV-14", "Todo"):
+    if is_todo(staging_key) and just_became(staging_key, "Todo"):
         spawn_agent(
-            "tl-agent", "dev-dev-14",
+            "tl-agent", f"dev-{staging_key.lower()}",
             f"""
-DEV-14 (CRE-44) has moved to Todo — Q-07 full regression passed.
+{staging_key} ({staging_lid}) has moved to Todo — {regression_key} full regression passed.
 
-Your task: deploy the Cremilo Monthly Calculator to Vercel staging.
+Your task: deploy the Cremilo {cfg["sub_app"]} to Vercel staging.
 
 Project root: {PROJECT_DIR}
 
@@ -964,7 +1278,7 @@ Steps:
 1. Ensure all feature PRs are merged to main.
 2. Trigger a Vercel production deploy (or verify it was triggered by the merge).
 3. Smoke-test the staging URL manually (load the app, verify login works).
-4. Move CRE-44 to 'Done' in Linear.
+4. Move {staging_lid} to 'Done' in Linear.
 
 This is Gate 2 — the final step before user acceptance.
 """.strip(),

@@ -1,0 +1,72 @@
+{
+  "sub_app": "Config",
+  "project_id": "41a628ef-957c-4ec1-aba9-45552cb5ddf8",
+  "pts_url": "https://linear.app/cremilo/document/pts-config-733abe4893f1",
+  "design_file": "DESIGN.md",
+  "prod_url": "https://cremilo.vercel.app",
+
+  "design_issues": [
+    ["D-11", "CRE-70", "Config main screen (4 sections: Payment Methods, Categories, Rates, Preferences)",
+     "All 4 sections visible on one scroll, each collapsible. Payment Methods: list by type, name + type badge + last4 if card, add button per type. Categories: grouped by grouping category, name + grouping badge + edit/delete, add category + add grouping. Rates: name + value + last updated + edit/delete, add custom rate. Preferences: number format radio, date format radio, global currency dropdown. Breathing room layout — not data-dense."],
+    ["D-12", "CRE-71", "Rate form modal + rate deletion flow",
+     "Rate form modal: name (text), value (numeric, text label 'ARS →' next to field), last updated timestamp on edit only, Save + Cancel. Deletion unreferenced path: simple confirm dialog 'Delete [Name]?'. Deletion referenced path: Step 1 — 'X entries use [Name]. Select a replacement rate.' Replacement dropdown of all other rates. Step 2 — 'X entries currently associated with [Name] ([value]) will be reassigned to [Replacement]. Their historical amounts will not change.' Confirm + Cancel."],
+    ["D-13", "CRE-72", "Category form modal + category deletion flow",
+     "Category form modal: name, grouping category dropdown (existing groupings + 'New grouping…' option). 'New grouping…' inline: expand inline name field + save both atomically on Save. Save + Cancel. Deletion flow: Step 1 — 'X entries use [Name]. Select a replacement category.' Replacement dropdown (all other categories + 'Create new category' inline). Step 2 — 'X entries using [Old Name] will be moved to [New Name]. [If grouping changes: Their grouping will also change from [Old Grouping] to [New Grouping].]' Confirm + Cancel."],
+    ["D-14", "CRE-73", "Grouping category form modal",
+     "Grouping category form modal: name field, Save + Cancel. Delete action: disabled with tooltip 'Reassign or delete all categories in this grouping first' when categories exist; enabled (simple confirm) when grouping is empty."],
+    ["D-15", "CRE-74", "Payment method form modal",
+     "Payment method form modal: name, type radio (card / cash / transfer), card_last4 (4-digit numeric — visible only when type = card), Save + Cancel. Deletion unreferenced: simple confirmation. Deletion referenced: 'X entries use this payment method. They will retain the name but it will no longer be available for new entries.' Confirm + Cancel."]
+  ],
+
+  "design_dev_map": {
+    "D-11": ["DEV-20", ["DEV-18", "I-07", "I-09"]],
+    "D-12": ["DEV-24", ["DEV-20", "DEV-18"]],
+    "D-13": ["DEV-22", ["DEV-20", "DEV-18"]],
+    "D-14": ["DEV-23", ["DEV-22", "DEV-18"]],
+    "D-15": ["DEV-21", ["DEV-20", "DEV-18"]]
+  },
+
+  "multi_dep_unlocks": [
+    {"deps": ["I-07"], "unlocks": ["DEV-18"]},
+    {"deps": ["I-09"], "unlocks": ["DEV-19"]},
+    {"deps": ["DEV-20", "DEV-18"], "unlocks": ["DEV-25"]}
+  ],
+
+  "fe_a_issues": {
+    "DEV-18": ["CRE-75", "Implement Config data layer — TanStack Query hooks for 5 entities: rates, grouping_categories, categories, payment_methods, user_config. Full CRUD per entity where applicable.", "I-07 (DB migrations + RLS)"],
+    "DEV-19": ["CRE-76", "Implement deep link handler — reads ?section= and ?highlight= query params, validates section against 4 slugs (payment-methods, categories, rates, preferences) and highlight as UUID, scrolls to section + applies 1s CSS highlight animation. Invalid params silently ignored.", "I-09 (Config routing)"]
+  },
+
+  "fe_b_issues": {
+    "DEV-20": ["CRE-77", "Implement Config main page layout — 4 collapsible sections (Payment Methods, Categories, Rates, Preferences) from approved D-11 design. Each section renders its list + add action.", "D-11 (design approved), DEV-18 (data layer), I-07 (DB), I-09 (routing)"],
+    "DEV-21": ["CRE-78", "Implement Payment Methods section + form modal from approved D-15 design. CRUD: add, edit, delete (simple confirm if unreferenced; soft-delete notice if referenced).", "D-15 (design approved), DEV-20 (main layout), DEV-18 (data layer)"],
+    "DEV-22": ["CRE-79", "Implement Categories section + form modal + deletion flow from approved D-13 design. Includes grouping category dropdown with inline 'New grouping…' creation. Deletion: replacement-select flow if entries exist.", "D-13 (design approved), DEV-20 (main layout), DEV-18 (data layer)"],
+    "DEV-23": ["CRE-80", "Implement Grouping Categories form from approved D-14 design. Inline form within categories section. Delete disabled with tooltip when categories exist under grouping.", "D-14 (design approved), DEV-22 (categories section), DEV-18 (data layer)"],
+    "DEV-24": ["CRE-81", "Implement Rates section + form modal + deletion flow from approved D-12 design. Deletion: replacement-select flow (referenced path) or simple confirm (unreferenced path).", "D-12 (design approved), DEV-20 (main layout), DEV-18 (data layer)"],
+    "DEV-25": ["CRE-82", "Implement Preferences section — number format radio, date format radio, global currency dropdown. Persists to user_config table via data layer.", "D-11 (design approved), DEV-20 (main layout), DEV-18 (data layer)"]
+  },
+
+  "qa_triggers": {
+    "Q-09": [["DEV-20"], "CRE-83", "E2E: Config main render + section navigation"],
+    "Q-10": [["DEV-21"], "CRE-84", "E2E: Payment methods CRUD"],
+    "Q-11": [["DEV-22"], "CRE-85", "E2E: Categories CRUD + deletion flow"],
+    "Q-12": [["DEV-24"], "CRE-86", "E2E: Rates CRUD + deletion flow"],
+    "Q-13": [["DEV-25"], "CRE-87", "E2E: Preferences — number/date format + global currency"],
+    "Q-14": [["DEV-19"], "CRE-88", "E2E: Deep link navigation (section scroll + highlight)"]
+  },
+
+  "qa_spawn": {
+    "Q-09": ["CRE-83", "Config main render + section navigation", "DEV-20"],
+    "Q-10": ["CRE-84", "Payment methods CRUD", "DEV-21"],
+    "Q-11": ["CRE-85", "Categories CRUD + deletion flow", "DEV-22"],
+    "Q-12": ["CRE-86", "Rates CRUD + deletion flow", "DEV-24"],
+    "Q-13": ["CRE-87", "Preferences — number/date format + global currency", "DEV-25"],
+    "Q-14": ["CRE-88", "Deep link navigation (section scroll + highlight)", "DEV-19"]
+  },
+
+  "all_dev_keys": ["DEV-18", "DEV-19", "DEV-20", "DEV-21", "DEV-22", "DEV-23", "DEV-24", "DEV-25"],
+  "regression_issue": "Q-15",
+  "regression_lid": "CRE-89",
+  "staging_issue": "DEV-26",
+  "staging_lid": "CRE-90"
+}
