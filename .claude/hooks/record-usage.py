@@ -5,11 +5,27 @@ cost estimate, elapsed time, tools used, and an enhancement tip.
 """
 
 import json
+import re
 import sys
 import os
 import subprocess
 from pathlib import Path
 from datetime import datetime
+
+_SECRET_PATTERNS = [
+    r'lin_api_[A-Za-z0-9_\-]+',
+    r'sk-ant-[A-Za-z0-9_\-]+',
+    r'sbp_[A-Za-z0-9]+',
+    r'ghp_[A-Za-z0-9]+',
+    r'github_pat_[A-Za-z0-9_]+',
+    r'AKIA[0-9A-Z]{16}',
+    r'eyJ[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+',
+]
+
+def _redact(text: str) -> str:
+    for pattern in _SECRET_PATTERNS:
+        text = re.sub(pattern, '[REDACTED]', text)
+    return text
 
 
 PRICING = {
@@ -164,11 +180,11 @@ def main():
     elapsed_str  = get_elapsed(session_id)
     tools_str    = ", ".join(sorted(tools_used)) if tools_used else "none"
     timestamp    = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    prompt_short = (last_user_prompt or "")[:100].replace("\n", " ")
+    prompt_short = _redact((last_user_prompt or "")[:100].replace("\n", " "))
     if len(last_user_prompt or "") > 100:
         prompt_short += "…"
 
-    enhancement = get_enhancement(last_user_prompt or "")
+    enhancement = get_enhancement(_redact(last_user_prompt or ""))
 
     entry = f"""## {timestamp}
 

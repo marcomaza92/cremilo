@@ -3,23 +3,29 @@
 ## Posture
 
 - Default to critical analysis. Verify before claiming. No sycophancy.
-- Push back on premature optimization and scope creep. The pipeline is on probation — see `~/www/personal/docs/cremilo/POST-MORTEM-AND-PLAN.md` § 5.4.
+- Push back on premature optimization and scope creep. The pipeline is on probation — see Post-Mortem & Plan in Linear (https://linear.app/cremilo/document/post-mortem-and-plan-95c68e233294) § 5.4.
 - When the user gives a premise that affects the plan, test it before acting on it.
 - When codifying a workaround, prove the underlying limitation first. Don't accept "it doesn't work" as the basis for a rule without testing.
 
 ## Orientation (read these first)
 
-Operational docs live **outside** the repo at `~/www/personal/docs/cremilo/` — they're shared notes about the project, not source-of-truth for the code:
+Business and operational docs live in **Linear** (single source of truth) and in `~/www/personal/docs/cremilo/` (private local, outside repo):
 
-- `~/www/personal/docs/cremilo/ROADMAP.md` — current state (YAML frontmatter), active phase + checklist, blockers, next_action. This is the session-start doc.
-- `~/www/personal/docs/cremilo/POST-MORTEM-AND-PLAN.md` — strategic context. Phases A–E. The "why" behind the plan.
-- `~/www/personal/docs/cremilo/ANNOY.md` — append-only annoy log, triaged at Phase B.
-- `~/www/personal/docs/cremilo/USAGE.md` — running history of Claude turns + token usage.
-- `~/www/personal/docs/cremilo/SESSIONS.md` — aggregated session durations (run `session-stats.py` to refresh).
-- `~/www/personal/docs/cremilo/agents/` — per-agent rationale docs.
+**Linear docs (https://linear.app/cremilo):**
+- [Roadmap](https://linear.app/cremilo/document/roadmap-6012a41bde5e) — current state (YAML frontmatter), active phase + checklist, blockers, next_action. Read by `session-start.py` via Linear API.
+- [Post-Mortem & Plan](https://linear.app/cremilo/document/post-mortem-and-plan-95c68e233294) — strategic context. Phases A–E. The "why" behind the plan.
+- [Annoy Log](https://linear.app/cremilo/document/annoy-log-1d283e89442d) — append-only annoy log, triaged at start of each Phase B.
+- [PA: Crémilo](https://linear.app/cremilo/document/pa-cremilo-0058df0d215c) — full product architecture (9 sub-apps, data flows, shared entities).
+- [PTS: Monthly Calculator](https://linear.app/cremilo/document/pts-monthly-calculator-ab1a3c40fb3a), [PTS: Config](https://linear.app/cremilo/document/pts-config-733abe4893f1), [PTS: Cloud Pipeline Migration](https://linear.app/cremilo/document/pts-cloud-pipeline-migration-6a88a43ec064) — product technical specs.
+- [Glossary](https://linear.app/cremilo/document/glossary-9740fffad32d) — Linear concepts, issue structure, conventions.
 
-In-repo specs:
-- `.prds/0001-monthly-calculator/DESIGN.md` — Style guidelines (Mondrian Neobrutalism design system, full tokens) + Design Rubric (18 predicates with verification classes).
+**Local private (outside repo) at `~/www/personal/docs/cremilo/`:**
+- `USAGE.md` — running history of Claude turns + token usage (written by `record-usage.py` hook).
+- `SESSIONS.md` — aggregated session durations (run `session-stats.py --append` to refresh).
+- `AGENTIC-SYSTEM.md` — full agentic system reference: four pillars, agent roster, pipeline mechanics, phase history, broken tools.
+
+**In-repo specs:**
+- `DESIGN.md` — Style guidelines (Mondrian Neobrutalism design system, full tokens) + Design Rubric (18 predicates with verification classes).
 - `.claude/skills/design-agent.md` — design-agent SKILL, operational rules, In-Review comment template.
 
 ## Project shape (one paragraph)
@@ -28,8 +34,8 @@ Cremilo is a multi-app finance *suite* (Monthly Calculator + Credit Cards + Inve
 
 ## Known broken / brittle tools — do not re-discover
 
-- **`mcp__stitch__edit_screens` does not persist** (verified 2026-05-20, three attempts, md5 unchanged after 5+ min polling). Treat Stitch as **create-only**. List superseded screens in the In-Review Linear comment under "Manual cleanup needed" — the human deletes manually in the Stitch UI.
-- **`mcp__stitch__*` deletion is unsupported.** Same workaround as above.
+- **`mcp__stitch__edit_screens` works with `GEMINI_3_1_PRO`** (verified 2026-06-08). Always pass `model: "GEMINI_3_1_PRO"` explicitly — `GEMINI_3_PRO` is deprecated and silently fails. Verify edits via `get_screen`: confirm `htmlCode.name` changed from before the call. Screenshot URL may lag; do not use it as the verification signal.
+- **`mcp__stitch__*` deletion is unsupported.** Screens cannot be deleted via API — only via the Stitch UI manually.
 - **`UserPromptSubmit` hook is not firing** for real user prompts (verified by direct synthetic invocation working). Run `python3 .docs/gate-watcher.py` manually at session start when needed.
 - **`mcp__scheduled-tasks__update_scheduled_task` is blocked in "unsupervised mode"** despite `allow: ["*"]` in settings. The user must trigger scheduled tasks manually from the Claude Code UI.
 
@@ -63,14 +69,14 @@ Cremilo is a multi-app finance *suite* (Monthly Calculator + Credit Cards + Inve
 
 **Design is spec.** When DEV-XX implements D-XX, the approved design (Stitch screens + DESIGN.md tokens) is the contract — even when the Linear ticket only links to the design rather than listing every UI behavior individually. Gate-watcher enforces this implicitly: D-XX must be approved (Accessibility + Manual review checklists ticked) before DEV-XX moves forward. So if behavior X is in the approved design, X is required for DEV-XX even when the ticket text doesn't echo it.
 
-**`~/www/personal/docs/cremilo/ANNOY.md` is for *pipeline annoyances***, not for feature requests against the app. Don't conflate.
+**The [Annoy Log](https://linear.app/cremilo/document/annoy-log-1d283e89442d) is for *pipeline annoyances***, not for feature requests against the app. Don't conflate.
 
 ## What this session should and shouldn't do
 
-- ✅ Ship the active Phase A milestone (see `next_action` in `~/www/personal/docs/cremilo/ROADMAP.md` frontmatter).
-- ✅ Update `~/www/personal/docs/cremilo/ROADMAP.md` frontmatter at session end.
-- ✅ Append to `~/www/personal/docs/cremilo/ANNOY.md` if something slowed you down.
-- ✅ Run `python3 ~/www/personal/docs/cremilo/session-stats.py --append` at session end to log net session time to `SESSIONS.md` (substrate for Phase C effort comparison).
+- ✅ Ship the active phase milestone (see `next_action` in [Roadmap](https://linear.app/cremilo/document/roadmap-6012a41bde5e) frontmatter, or run `python3 .docs/session-start.py`).
+- ✅ Update [Roadmap](https://linear.app/cremilo/document/roadmap-6012a41bde5e) frontmatter at session end.
+- ✅ Append to [Annoy Log](https://linear.app/cremilo/document/annoy-log-1d283e89442d) if something slowed you down.
+- ✅ Run `python3 ~/www/personal/docs/cremilo/session-stats.py --append` at session end to log net session time to `SESSIONS.md`.
 - ❌ Don't refactor the pipeline.
 - ❌ Don't add new agents.
 - ❌ Don't improve SKILLs beyond what's needed to unblock today's milestone.

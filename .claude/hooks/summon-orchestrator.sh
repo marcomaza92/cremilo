@@ -10,7 +10,7 @@ PROMPT=$(echo "$INPUT" | jq -r '.user_prompt // empty')
 # Only activate on summon phrase
 echo "$PROMPT" | grep -qiE 'summon the team' || exit 0
 
-PROJECT=/Users/marcomaza/www/personal/cremilo
+PROJECT="${PWD}"
 
 echo "=== 🚀 ORCHESTRATOR PRE-RUN ==="
 echo ""
@@ -26,7 +26,8 @@ python3 - <<'PYEOF'
 import json
 from datetime import datetime, timedelta, timezone
 
-QUEUE = '/Users/marcomaza/www/personal/cremilo/.docs/pending-agents.json'
+import os
+QUEUE = os.path.join(os.environ.get('PWD', ''), '.docs/pending-agents.json')
 queue = json.loads(open(QUEUE).read())
 types = sorted(set(x['type'] for x in queue if x.get('status') == 'pending'))
 
