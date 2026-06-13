@@ -184,24 +184,35 @@ _TEAM_ID    = "5c088e06-e8e8-4311-9da8-19c178bbbba7"
 _PROJECT_ID = cfg["project_id"]
 
 
-def fetch_issues() -> list[dict]:
-    """Return all issues in the Monthly Calculator project via Linear GraphQL."""
-    try:
-        data = _gql("""
-            query($projectId: String!) {
-              project(id: $projectId) {
-                issues(first: 100) {
-                  nodes {
-                    identifier
-                    title
-                    state { name }
-                  }
-                }
+def _fetch_project_issues(project_id: str) -> list[dict]:
+    data = _gql("""
+        query($projectId: String!) {
+          project(id: $projectId) {
+            issues(first: 100) {
+              nodes {
+                identifier
+                title
+                state { name }
               }
             }
-        """, {"projectId": _PROJECT_ID})
-        nodes = (data.get("data") or {}).get("project", {}).get("issues", {}).get("nodes", [])
-        return [{"id": n["identifier"], "title": n["title"], "status": n["state"]["name"]} for n in nodes]
+          }
+        }
+    """, {"projectId": project_id})
+    nodes = (data.get("data") or {}).get("project", {}).get("issues", {}).get("nodes", [])
+    return [{"id": n["identifier"], "title": n["title"], "status": n["state"]["name"]} for n in nodes]
+
+
+def fetch_issues() -> list[dict]:
+    """Return all issues across all configured projects via Linear GraphQL."""
+    try:
+        seen: set[str] = set()
+        result: list[dict] = []
+        for pid in [_PROJECT_ID] + cfg.get("extra_project_ids", []):
+            for issue in _fetch_project_issues(pid):
+                if issue["id"] not in seen:
+                    seen.add(issue["id"])
+                    result.append(issue)
+        return result
     except Exception as e:
         log(f"  WARN: Linear API fetch failed — {e}")
         return []

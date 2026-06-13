@@ -1,6 +1,7 @@
 {
   "sub_app": "Config",
   "project_id": "41a628ef-957c-4ec1-aba9-45552cb5ddf8",
+  "extra_project_ids": ["9a41fcbf-4d31-4e8a-b2aa-203d58c43db6"],
   "pts_url": "https://linear.app/cremilo/document/pts-config-733abe4893f1",
   "design_file": "DESIGN.md",
   "prod_url": "https://cremilo.vercel.app",
