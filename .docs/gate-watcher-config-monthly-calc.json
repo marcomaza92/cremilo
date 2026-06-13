@@ -1,0 +1,54 @@
+{
+  "sub_app": "Monthly Calculator",
+  "project_id": "e4bb212a-8e3f-4f64-bdd0-18c4b256b8ed",
+  "pts_url": "https://linear.app/cremilo/document/pts-monthly-calculator-ab1a3c40fb3a",
+  "design_file": "DESIGN.md",
+  "prod_url": "https://cremilo.vercel.app",
+
+  "design_issues": [
+    ["D-07", "CRE-27", "Config screen — Rates section",
+     "Settings page, Rates sub-section. Shows current USD→ARS exchange rate. Input to update it manually. Saved indicator. Section header with bold label and divider in neobrutalist style."],
+    ["D-08", "CRE-28", "Config screen — Format section",
+     "Format sub-section below Rates. Options: decimal separator (. or ,), currency symbol position (prefix/suffix), date format (DD/MM/YYYY or MM/DD/YYYY). Toggle or select controls, consistent with the design system."],
+    ["D-09", "CRE-29", "Config screen — Impuesto de Sellos section",
+     "Toggle to enable/disable the 1.49% Impuesto de Sellos tax. When enabled: show calculated tax amount on applicable transactions. Explanatory label below the toggle."]
+  ],
+
+  "design_dev_map": {
+    "D-07": ["DEV-10", ["I-02"]],
+    "D-08": ["DEV-11", ["I-02"]],
+    "D-09": ["DEV-12", ["DEV-10"]]
+  },
+
+  "multi_dep_unlocks": [
+    {"deps": ["DEV-04", "DEV-05"], "unlocks": ["DEV-07", "DEV-08"]},
+    {"deps": ["DEV-04", "DEV-06"], "unlocks": ["DEV-09"]}
+  ],
+
+  "fe_a_issues": {
+    "DEV-13": ["CRE-43", "Implement financial logic utilities — ROI, installment tracking, Impuesto de Sellos (1.49%), ARS/USD conversion", "I-05 (data schema)"]
+  },
+
+  "fe_b_issues": {
+    "DEV-09": ["CRE-39", "Build Tarjetas section pages — wire components to useTarjetas hook", "DEV-04, DEV-06 (components)"],
+    "DEV-10": ["CRE-40", "Build Config — Rates section from D-07", "D-07 (design), I-02 (Supabase)"],
+    "DEV-11": ["CRE-41", "Build Config — Exchange rate input + persistence from D-08", "D-08 (design), I-02 (Supabase)"],
+    "DEV-12": ["CRE-42", "Build Config — Impuesto de Sellos toggle from D-09", "D-09 (design), DEV-10 (Config Rates)"]
+  },
+
+  "qa_triggers": {
+    "Q-05": [["DEV-13"], "CRE-49", "E2E: Financial logic — ROI, installments, Impuesto de Sellos"],
+    "Q-06": [["DEV-10", "DEV-11", "DEV-12"], "CRE-50", "E2E: Config screen — rates, exchange rate persistence, tax toggle"]
+  },
+
+  "qa_spawn": {
+    "Q-05": ["CRE-49", "Financial logic — ROI, installments, Impuesto de Sellos", "DEV-13"],
+    "Q-06": ["CRE-50", "Config screen — rates, exchange rate, tax toggle", "DEV-10, DEV-11, DEV-12"]
+  },
+
+  "all_dev_keys": ["DEV-01", "DEV-02", "DEV-03", "DEV-04", "DEV-05", "DEV-06", "DEV-07", "DEV-08", "DEV-09", "DEV-10", "DEV-11", "DEV-12", "DEV-13"],
+  "regression_issue": "Q-07",
+  "regression_lid": "CRE-51",
+  "staging_issue": "DEV-14",
+  "staging_lid": "CRE-44"
+}

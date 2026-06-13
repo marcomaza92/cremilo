@@ -21,20 +21,42 @@ from datetime import datetime
 from pathlib import Path
 
 PROJECT_DIR    = Path(__file__).parent.parent
-MAP_FILE       = Path(__file__).parent / "gate-watcher-map.json"
-CONFIG_FILE    = Path(__file__).parent / "gate-watcher-config.json"
-LOG_FILE       = Path(__file__).parent / "gate-watcher.log"
-STATE_FILE     = Path("/tmp/gate-watcher-state.json")
-AGENT_LOGS     = Path(__file__).parent / "agent-logs"
+_DOCS_DIR      = Path(__file__).parent
+LOG_FILE       = _DOCS_DIR / "gate-watcher.log"
+AGENT_LOGS     = _DOCS_DIR / "agent-logs"
 SKILLS_DIR     = PROJECT_DIR / ".claude" / "skills"
-PENDING_AGENTS = Path(__file__).parent / "pending-agents.json"
+PENDING_AGENTS = _DOCS_DIR / "pending-agents.json"
 DESIGN_FILE    = PROJECT_DIR / "DESIGN.md"
 
-# ── Sub-app config ────────────────────────────────────────────────────────────
+# ── Sub-app selection via --sub-app <slug> ────────────────────────────────────
+# Usage:
+#   python3 gate-watcher.py                    → uses gate-watcher-config.json (default)
+#   python3 gate-watcher.py --sub-app monthly-calc  → uses gate-watcher-config-monthly-calc.json
+#   python3 gate-watcher.py --sub-app phase-c       → uses gate-watcher-config-phase-c.json
+
+def _resolve_sub_app() -> tuple[Path, Path, Path]:
+    slug = None
+    args = sys.argv[1:]
+    if "--sub-app" in args:
+        idx = args.index("--sub-app")
+        if idx + 1 < len(args):
+            slug = args[idx + 1]
+    if slug:
+        cfg_file   = _DOCS_DIR / f"gate-watcher-config-{slug}.json"
+        map_file   = _DOCS_DIR / f"gate-watcher-map-{slug}.json"
+        state_file = Path(f"/tmp/gate-watcher-state-{slug}.json")
+    else:
+        cfg_file   = _DOCS_DIR / "gate-watcher-config.json"
+        map_file   = _DOCS_DIR / "gate-watcher-map.json"
+        state_file = Path("/tmp/gate-watcher-state.json")
+    return cfg_file, map_file, state_file
+
+CONFIG_FILE, MAP_FILE, STATE_FILE = _resolve_sub_app()
+
 
 def _load_config() -> dict:
     if not CONFIG_FILE.exists():
-        log(f"ERROR: {CONFIG_FILE} not found — create it for the active sub-app")
+        print(f"ERROR: {CONFIG_FILE} not found")
         sys.exit(1)
     return json.loads(CONFIG_FILE.read_text())
 
