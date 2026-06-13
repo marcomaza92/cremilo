@@ -6,6 +6,7 @@ import { UserData, UserInfo } from "@/types/user";
 import ExpensesSection from "./ExpensesSection";
 import GastosFijosSection from "./GastosFijosSection";
 import IngresosSection from "./IngresosSection";
+import TarjetasSection from "./TarjetasSection";
 import SummaryBoxes from "@/app/components/SummaryBoxes/SummaryBoxes";
 
 const initialUser: UserInfo = {
@@ -68,6 +69,7 @@ const Dashboard = async () => {
         <SummaryBoxes />
         <IngresosSection />
         <GastosFijosSection />
+        <TarjetasSection />
         <ExpensesSection />
       </main>
     </div>
