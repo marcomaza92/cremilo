@@ -30,9 +30,9 @@ DESIGN_FILE    = PROJECT_DIR / "DESIGN.md"
 
 # ── Sub-app selection via --sub-app <slug> ────────────────────────────────────
 # Usage:
-#   python3 gate-watcher.py                    → uses gate-watcher-config.json (default)
+#   python3 gate-watcher.py                         → uses gate-watcher-config.json (default)
 #   python3 gate-watcher.py --sub-app monthly-calc  → uses gate-watcher-config-monthly-calc.json
-#   python3 gate-watcher.py --sub-app phase-c       → uses gate-watcher-config-phase-c.json
+#   python3 gate-watcher.py --sub-app config        → uses gate-watcher-config-config.json
 
 def _resolve_sub_app() -> tuple[Path, Path, Path]:
     slug = None
