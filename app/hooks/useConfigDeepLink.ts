@@ -41,14 +41,20 @@ export function useConfigDeepLink() {
 
     sectionEl.scrollIntoView({ behavior: "smooth", block: "start" });
 
+    let timerId: ReturnType<typeof setTimeout> | undefined;
+
     if (isValidUuid(highlight)) {
       const rowEl = document.getElementById(`config-row-${highlight}`);
       if (rowEl) {
         rowEl.classList.add("config-row--highlighted");
-        setTimeout(() => {
+        timerId = setTimeout(() => {
           rowEl.classList.remove("config-row--highlighted");
         }, 1000);
       }
     }
+
+    return () => {
+      clearTimeout(timerId);
+    };
   }, [searchParams]);
 }
