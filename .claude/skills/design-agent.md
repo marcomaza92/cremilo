@@ -85,7 +85,7 @@ If an edit did not persist (htmlCode.name unchanged after `get_screen` verify), 
 - **`mcp__stitch__edit_screens` works with `GEMINI_3_1_PRO`** (verified 2026-06-08). Always pass `model: "GEMINI_3_1_PRO"` — never `GEMINI_3_PRO` (deprecated, silently fails).
 - **Verify edits via `get_screen`**: after calling `edit_screens`, call `get_screen` and confirm `htmlCode.name` changed from before. Screenshot URL may lag — do not use it as verification.
 - **`mcp__stitch__*` deletion is unsupported via API.** Screens can only be deleted manually in the Stitch UI.
-- **If `generate_screen_from_text` times out**, call `list_screens` immediately — Stitch generates server-side and the screen may already be present. Do not count a timeout as failure until `list_screens` confirms the screen is absent.
+- **If `generate_screen_from_text` times out**, wait ~60 seconds before calling `list_screens` — Stitch generates server-side asynchronously and the screen may not be indexed immediately. Do not count a timeout as failure until `list_screens` (run after the delay) confirms the screen is absent.
 - **No pre-approval attachments.** Do not attach Stitch URLs to the Linear issue at In-Review stage. URLs live in the comment body. Gate-watcher creates attachments on `/approve`.
 - **For any revision**, read all prior Linear comments first. Address every point. Note which prior feedback was addressed in the new delivery comment.
 - When reviewer feedback introduces a permanent constraint, propose adding it to `DESIGN.md` in the next delivery comment.
