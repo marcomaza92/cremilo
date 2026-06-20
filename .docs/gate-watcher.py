@@ -44,11 +44,11 @@ def _resolve_sub_app() -> tuple[Path, Path, Path]:
     if slug:
         cfg_file   = _DOCS_DIR / f"gate-watcher-config-{slug}.json"
         map_file   = _DOCS_DIR / f"gate-watcher-map-{slug}.json"
-        state_file = Path(f"/tmp/gate-watcher-state-{slug}.json")
+        state_file = _DOCS_DIR / f"gate-watcher-state-{slug}.json"
     else:
         cfg_file   = _DOCS_DIR / "gate-watcher-config.json"
         map_file   = _DOCS_DIR / "gate-watcher-map.json"
-        state_file = Path("/tmp/gate-watcher-state.json")
+        state_file = _DOCS_DIR / "gate-watcher-state.json"
     return cfg_file, map_file, state_file
 
 CONFIG_FILE, MAP_FILE, STATE_FILE = _resolve_sub_app()
