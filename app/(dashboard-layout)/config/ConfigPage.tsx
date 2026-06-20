@@ -2,6 +2,7 @@
 
 import { Suspense } from "react";
 import { useConfigDeepLink } from "@/app/hooks/useConfigDeepLink";
+import RatesSection from "./RatesSection";
 import styles from "./page.module.css";
 
 function ConfigDeepLinkHandler() {
@@ -29,7 +30,7 @@ const ConfigPage = () => {
           <h2 id="rates-heading" className={styles.page__sectionTitle}>
             TASAS
           </h2>
-          {/* DEV-18/DEV-24 will populate this section */}
+          <RatesSection />
         </section>
 
         <section
