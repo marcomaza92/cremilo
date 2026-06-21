@@ -5,9 +5,9 @@
   "G0-4": "Done",
   "D-11": "Done",
   "D-12": "In Progress",
-  "D-13": "In Progress",
-  "D-14": "In Progress",
-  "D-15": "In Progress",
+  "D-13": "Backlog",
+  "D-14": "Backlog",
+  "D-15": "Backlog",
   "I-07": null,
   "I-08": null,
   "I-09": null,
@@ -32,9 +32,6 @@
   "spawned": [
     "gate0-design-d-11",
     "gate0-design-d-12",
-    "gate0-design-d-13",
-    "gate0-design-d-14",
-    "gate0-design-d-15",
     "gate0-tl",
     "gate0-qa"
   ]
