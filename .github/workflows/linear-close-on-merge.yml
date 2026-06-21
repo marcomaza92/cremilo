@@ -1,0 +1,54 @@
+name: Close Linear issue on PR merge
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  close-linear-issue:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Parse CRE issue ID from PR title
+        id: parse
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          issue_id=$(echo "$PR_TITLE" | grep -oP '(?<=\[)CRE-\d+(?=\])' || true)
+          echo "issue_id=$issue_id" >> "$GITHUB_OUTPUT"
+          if [ -z "$issue_id" ]; then
+            echo "No CRE-XX found in PR title — skipping."
+          else
+            echo "Found Linear issue: $issue_id"
+          fi
+
+      - name: Move Linear issue to Done
+        if: steps.parse.outputs.issue_id != ''
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          ISSUE_ID: ${{ steps.parse.outputs.issue_id }}
+          DONE_STATE_ID: "cbe68e4e-2fe2-4a79-a9a3-7d3548254b6a"
+        run: |
+          set -euo pipefail
+
+          issue_uuid=$(curl -fsSL -X POST https://api.linear.app/graphql \
+            -H "Authorization: $LINEAR_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "{\"query\": \"query { issue(id: \\\"$ISSUE_ID\\\") { id title } }\"}" \
+            | jq -r '.data.issue.id')
+
+          if [ -z "$issue_uuid" ] || [ "$issue_uuid" = "null" ]; then
+            echo "::warning::Could not resolve UUID for $ISSUE_ID — skipping Linear update."
+            exit 0
+          fi
+
+          echo "Resolved $ISSUE_ID → UUID $issue_uuid"
+
+          curl -fsSL -X POST https://api.linear.app/graphql \
+            -H "Authorization: $LINEAR_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "{\"query\": \"mutation { issueUpdate(id: \\\"$issue_uuid\\\", input: { stateId: \\\"$DONE_STATE_ID\\\" }) { success } }\"}" \
+            | jq '.data.issueUpdate'
+
+          echo "Linear issue $ISSUE_ID moved to Done."
