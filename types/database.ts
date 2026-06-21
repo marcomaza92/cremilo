@@ -78,28 +78,28 @@ export interface Database {
       };
       user_config: {
         Row: {
-          id: string;
           user_id: string;
           date_format: string;
           number_format: string;
           global_currency: string;
-          global_currency_rate: number;
+          global_rate_id: string | null;
+          updated_at: string;
         };
         Insert: {
-          id?: string;
           user_id: string;
           date_format?: string;
           number_format?: string;
           global_currency?: string;
-          global_currency_rate?: number;
+          global_rate_id?: string | null;
+          updated_at?: string;
         };
         Update: {
-          id?: string;
           user_id?: string;
           date_format?: string;
           number_format?: string;
           global_currency?: string;
-          global_currency_rate?: number;
+          global_rate_id?: string | null;
+          updated_at?: string;
         };
       };
     };

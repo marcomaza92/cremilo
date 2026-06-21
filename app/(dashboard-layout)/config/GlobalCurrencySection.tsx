@@ -1,6 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { createClient } from "@/utils/supabase/client";
 import { useUserConfig } from "@/app/hooks/useUserConfig";
+import { Rate } from "@/app/hooks/useRates";
 import styles from "./GlobalCurrencySection.module.css";
 
 const CURRENCIES = ["ARS", "USD", "EUR"] as const;
@@ -8,19 +11,36 @@ type Currency = (typeof CURRENCIES)[number];
 
 export default function GlobalCurrencySection() {
   const { config, loading, saving, update } = useUserConfig();
+  const [rates, setRates] = useState<Rate[]>([]);
+  const [ratesLoading, setRatesLoading] = useState(true);
+
   const currency = config.global_currency as Currency;
-  const showRate = currency !== "ARS";
+  const showRateSelector = currency !== "ARS";
+
+  useEffect(() => {
+    const supabase = createClient();
+    (async () => {
+      setRatesLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { setRatesLoading(false); return; }
+      const { data } = await supabase
+        .from("rates")
+        .select("id, name, value")
+        .eq("user_id", user.id)
+        .order("name", { ascending: true });
+      setRates((data as Rate[]) ?? []);
+      setRatesLoading(false);
+    })();
+  }, []);
 
   function setCurrency(next: Currency) {
-    update({ global_currency: next, global_currency_rate: next === "ARS" ? 0 : config.global_currency_rate });
+    update({
+      global_currency: next,
+      global_rate_id: next === "ARS" ? null : config.global_rate_id,
+    });
   }
 
-  function setRate(raw: string) {
-    const parsed = parseFloat(raw);
-    if (!isNaN(parsed) && parsed >= 0) {
-      update({ global_currency_rate: parsed });
-    }
-  }
+  const selectedRate = rates.find((r) => r.id === config.global_rate_id);
 
   if (loading) return <p className={styles.currency__empty}>Cargando...</p>;
 
@@ -28,7 +48,11 @@ export default function GlobalCurrencySection() {
     <div className={styles.currency} aria-busy={saving}>
       <div className={styles.currency__row}>
         <span className={styles.currency__label}>Moneda predeterminada</span>
-        <div className={styles.currency__toggleGroup} role="group" aria-label="Moneda predeterminada">
+        <div
+          className={styles.currency__toggleGroup}
+          role="group"
+          aria-label="Moneda predeterminada"
+        >
           {CURRENCIES.map((c) => (
             <button
               key={c}
@@ -43,30 +67,49 @@ export default function GlobalCurrencySection() {
         </div>
       </div>
 
-      {showRate && (
+      {showRateSelector && (
         <div className={styles.currency__row}>
-          <label className={styles.currency__label} htmlFor="global-currency-rate">
+          <label
+            className={styles.currency__label}
+            htmlFor="global-rate-select"
+          >
             Tasa de cambio ({currency}/ARS)
           </label>
-          <input
-            id="global-currency-rate"
-            type="number"
-            className={styles.currency__input}
-            value={config.global_currency_rate || ""}
-            onChange={(e) => setRate(e.target.value)}
-            placeholder="0.00"
-            step="any"
-            min="0"
-            aria-label={`Tasa de cambio ${currency} a ARS`}
-          />
+          {ratesLoading ? (
+            <span className={styles.currency__hint}>Cargando tasas...</span>
+          ) : rates.length === 0 ? (
+            <span className={styles.currency__hint}>
+              Agregá una tasa en la sección TASAS primero.
+            </span>
+          ) : (
+            <select
+              id="global-rate-select"
+              className={styles.currency__select}
+              value={config.global_rate_id ?? ""}
+              onChange={(e) =>
+                update({ global_rate_id: e.target.value || null })
+              }
+              aria-label={`Seleccionar tasa de cambio ${currency} a ARS`}
+            >
+              <option value="">— Seleccionar tasa —</option>
+              {rates.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.name} ({r.value})
+                </option>
+              ))}
+            </select>
+          )}
         </div>
       )}
 
-      {showRate && config.global_currency_rate > 0 && (
-        <div className={styles.currency__preview} aria-label="Vista previa de conversión">
+      {showRateSelector && selectedRate && (
+        <div
+          className={styles.currency__preview}
+          aria-label="Vista previa de conversión"
+        >
           <span className={styles.currency__previewLabel}>Vista previa</span>
           <span className={styles.currency__previewValue}>
-            1 {currency} = {config.global_currency_rate.toLocaleString("es-AR")} ARS
+            1 {currency} = {selectedRate.value.toLocaleString("es-AR")} ARS
           </span>
         </div>
       )}

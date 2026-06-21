@@ -8,11 +8,10 @@ const DATE_FORMATS = ["DD/MM/YYYY", "MM/DD/YYYY", "YYYY-MM-DD"];
 // number_format encodes decimal separator + currency position as "decimal-position"
 // e.g. "comma-prefix" → decimal comma (1.234,56), symbol before ($ 100)
 function parseNumberFormat(fmt: string): { decimal: "comma" | "dot"; position: "prefix" | "suffix" } {
-  const [decimal, position] = fmt.split("-");
-  return {
-    decimal: decimal === "dot" ? "dot" : "comma",
-    position: position === "suffix" ? "suffix" : "prefix",
-  };
+  const parts = fmt.split("-");
+  const decimal = parts[0] === "dot" ? "dot" : "comma";
+  const position = parts[1] === "suffix" ? "suffix" : "prefix";
+  return { decimal, position };
 }
 
 function buildPreview(decimal: "comma" | "dot", position: "prefix" | "suffix"): string {
