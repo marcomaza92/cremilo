@@ -2,7 +2,8 @@
 """
 Session-start summary for Cremilo.
 Prints a one-page "you are here" — phase, next action, blockers,
-live Linear state, gate status, and recent gate-watcher activity.
+live Linear state per sub-app, gate status per sub-app, and recent
+gate-watcher activity.
 
 Usage:
     python3 ~/www/personal/cremilo/.docs/session-start.py
@@ -19,15 +20,14 @@ from datetime import datetime
 from pathlib import Path
 
 PROJECT_DIR  = Path(__file__).parent.parent
-MAP_FILE     = Path(__file__).parent / "gate-watcher-map.json"
+_DOCS_DIR    = Path(__file__).parent
 
 # Linear doc IDs — single source of truth
 ROADMAP_DOC_ID = "072e5656-b40f-4ac9-a49a-aebd99b22db1"
-LOG_FILE     = Path(__file__).parent / "gate-watcher.log"
-PENDING_FILE = Path(__file__).parent / "pending-agents.json"
+LOG_FILE     = _DOCS_DIR / "gate-watcher.log"
+PENDING_FILE = _DOCS_DIR / "pending-agents.json"
 
 LINEAR_URL   = "https://api.linear.app/graphql"
-_PROJECT_ID  = "e4bb212a-8e3f-4f64-bdd0-18c4b256b8ed"
 
 WIDTH = 65
 
@@ -79,19 +79,74 @@ def header(title: str) -> str:
     return f"\n{title}\n" + "─" * len(title)
 
 
+# ── Sub-app discovery ─────────────────────────────────────────────────────────
+
+def _discover_sub_apps() -> list[tuple[str, dict, dict]]:
+    """
+    Return [(slug, cfg, issue_map), ...] for every gate-watcher-config-{slug}.json
+    that has a matching gate-watcher-map-{slug}.json.
+    """
+    result = []
+    for f in sorted(_DOCS_DIR.glob("gate-watcher-config-*.json")):
+        slug = f.stem[len("gate-watcher-config-"):]
+        map_file = _DOCS_DIR / f"gate-watcher-map-{slug}.json"
+        if not map_file.exists():
+            continue
+        try:
+            cfg       = json.loads(f.read_text())
+            issue_map = json.loads(map_file.read_text())
+            result.append((slug, cfg, issue_map))
+        except Exception:
+            continue
+    return result
+
+
+# ── Linear state ──────────────────────────────────────────────────────────────
+
+def _fetch_project_issues(project_id: str) -> list[dict]:
+    data = _gql("""
+        query($projectId: String!) {
+          project(id: $projectId) {
+            issues(first: 100) {
+              nodes { identifier title state { name } }
+            }
+          }
+        }
+    """, {"projectId": project_id})
+    nodes = (data.get("data") or {}).get("project", {}).get("issues", {}).get("nodes", [])
+    return [{"id": n["identifier"], "title": n["title"], "status": n["state"]["name"]} for n in nodes]
+
+
+def fetch_issues_for(cfg: dict) -> list[dict]:
+    """Fetch all issues across a sub-app's project_id + extra_project_ids."""
+    seen: set[str] = set()
+    result: list[dict] = []
+    pids = [cfg["project_id"]] + cfg.get("extra_project_ids", [])
+    for pid in pids:
+        for issue in _fetch_project_issues(pid):
+            if issue["id"] not in seen:
+                seen.add(issue["id"])
+                result.append(issue)
+    return result
+
+
+def status_of(key: str, issue_map: dict, issues: list[dict]) -> str | None:
+    lid = issue_map.get(key)
+    if not lid:
+        return None
+    for i in issues:
+        if i["id"] == lid:
+            return i["status"]
+    return None
+
+
 # ── ROADMAP frontmatter ────────────────────────────────────────────────────────
 
 def parse_frontmatter(source) -> dict:
-    """Extract YAML frontmatter from the first --- block.
-    Accepts a Path (local file) or a string (e.g. fetched Linear doc content).
-    Handles: simple key: value, block scalars (key: |), sequences (key:\n  - item),
-    and frontmatter wrapped in a ```yaml ... ``` code block.
-    """
     if isinstance(source, Path):
         text = source.read_text() if source.exists() else ""
     else:
         text = source or ""
-    # Handle code-block-wrapped frontmatter (Linear wraps --- blocks in ```yaml)
     cb = re.match(r"^```(?:yaml)?\n(---\n.*?\n---)\n```", text, re.DOTALL)
     if cb:
         text = cb.group(1) + text[cb.end():]
@@ -100,7 +155,7 @@ def parse_frontmatter(source) -> dict:
         return {}
     result: dict = {}
     current_key: str | None = None
-    mode: str | None = None   # "scalar" | "list"
+    mode: str | None = None
     buf: list[str] = []
 
     def flush():
@@ -140,36 +195,9 @@ def parse_frontmatter(source) -> dict:
     return result
 
 
-# ── Linear state ──────────────────────────────────────────────────────────────
-
-def fetch_issues() -> list[dict]:
-    data = _gql("""
-        query($projectId: String!) {
-          project(id: $projectId) {
-            issues(first: 100) {
-              nodes { identifier title state { name } }
-            }
-          }
-        }
-    """, {"projectId": _PROJECT_ID})
-    nodes = (data.get("data") or {}).get("project", {}).get("issues", {}).get("nodes", [])
-    return [{"id": n["identifier"], "title": n["title"], "status": n["state"]["name"]} for n in nodes]
-
-
-def status_of(key: str, issue_map: dict, issues: list[dict]) -> str | None:
-    lid = issue_map.get(key)
-    if not lid:
-        return None
-    for i in issues:
-        if i["id"] == lid:
-            return i["status"]
-    return None
-
-
 # ── Gate-watcher log ──────────────────────────────────────────────────────────
 
 def last_cycles(n: int = 3) -> list[str]:
-    """Return the last n cycle summaries from the gate-watcher log."""
     if not LOG_FILE.exists():
         return []
     lines = LOG_FILE.read_text().splitlines()
@@ -215,12 +243,68 @@ def pending_agents() -> list[dict]:
         return []
 
 
+# ── Per-sub-app display ───────────────────────────────────────────────────────
+
+def print_sub_app_block(slug: str, cfg: dict, issue_map: dict, issues: list[dict]):
+    label = cfg.get("sub_app", slug)
+    print(f"\n{'─' * WIDTH}")
+    print(f"  SUB-APP: {label}")
+    print(f"{'─' * WIDTH}")
+
+    # Linear state counts
+    by_status: dict[str, list[str]] = {}
+    tracked = set(issue_map.values())
+    for i in issues:
+        by_status.setdefault(i["status"], []).append(i["id"])
+
+    order  = ["In Progress", "In Review", "Todo", "Done", "Backlog", "Cancelled"]
+    icons  = {"In Progress": "🔵", "In Review": "🟣", "Todo": "⬜", "Done": "✅", "Backlog": "◻", "Cancelled": "✖"}
+    for s in order:
+        ids = by_status.get(s, [])
+        if not ids:
+            continue
+        icon = icons.get(s, "·")
+        if s == "Done":
+            print(f"  {icon} {s:<14} {len(ids)}")
+        else:
+            print(f"  {icon} {s:<14} {len(ids)}  — {', '.join(ids)}")
+
+    active = [i for i in issues if i["status"] not in ("Done", "Backlog", "Cancelled") and i["id"] in tracked]
+    if active:
+        print()
+        print("  Active tracked issues:")
+        for i in active:
+            key = next((k for k, v in issue_map.items() if v == i["id"]), i["id"])
+            print(f"    [{i['status']:<12}]  {key} — {i['title'][:40]}")
+
+    # Gate status
+    print(f"\n  Gate status:")
+    g0_keys = ["G0-1", "G0-2", "G0-3", "G0-4"]
+    g0_done = all(status_of(k, issue_map, issues) == "Done" for k in g0_keys)
+    print(f"    Gate 0  {'✅ cleared' if g0_done else '🔴 not cleared'}")
+
+    d_keys = [entry[0] for entry in cfg.get("design_issues", [])]
+    d_total = len(d_keys)
+    d_done  = sum(1 for k in d_keys if status_of(k, issue_map, issues) == "Done")
+    print(f"    Gate 1  {d_done}/{d_total} designs done")
+
+    reg_key = cfg.get("regression_issue", "")
+    reg_status = status_of(reg_key, issue_map, issues) if reg_key else None
+    if reg_status == "Done":
+        reg_label = "✅ passed"
+    elif reg_status:
+        reg_label = f"pending ({reg_key} is {reg_status})"
+    else:
+        reg_label = "pending"
+    print(f"    Gate 2  {reg_label}")
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
     roadmap_text = fetch_document_content(ROADMAP_DOC_ID)
     fm = parse_frontmatter(roadmap_text)
-    issue_map = json.loads(MAP_FILE.read_text()) if MAP_FILE.exists() else {}
+    sub_apps = _discover_sub_apps()
 
     print()
     print(rule("━"))
@@ -230,8 +314,8 @@ def main():
     print(f"  CREMILO — {today}   (Phase {phase}: {label})")
     print(rule("━"))
 
-    substage   = fm.get("active_substage", "—")
-    last_date  = fm.get("last_session_date", "—")
+    substage  = fm.get("active_substage", "—")
+    last_date = fm.get("last_session_date", "—")
     print(f"\nSubstage     : {substage}")
     print(f"Last session : {last_date}")
 
@@ -253,54 +337,17 @@ def main():
                 if b:
                     print(f"  ⚠  {b}")
 
-    # ── Linear state ─────────────────────────────────────────────────────────
-    print(header("LINEAR STATE"))
-    issues = fetch_issues()
-    if not issues:
-        print("  (could not fetch — check LINEAR_API_KEY)")
+    # ── Per-sub-app blocks ────────────────────────────────────────────────────
+    if not sub_apps:
+        print("\n  (no gate-watcher-config-{slug}.json files found)")
     else:
-        by_status: dict[str, list[str]] = {}
-        for i in issues:
-            by_status.setdefault(i["status"], []).append(i["id"])
-
-        order = ["In Progress", "In Review", "Todo", "Done", "Backlog", "Cancelled"]
-        icons = {"In Progress": "🔵", "In Review": "🟣", "Todo": "⬜", "Done": "✅", "Backlog": "◻", "Cancelled": "✖"}
-        for s in order:
-            ids = by_status.get(s, [])
-            if not ids:
+        print(header("LINEAR STATE + GATES"))
+        for slug, cfg, issue_map in sub_apps:
+            issues = fetch_issues_for(cfg)
+            if not issues:
+                print(f"\n  {cfg.get('sub_app', slug)}: (could not fetch — check LINEAR_API_KEY)")
                 continue
-            icon = icons.get(s, "·")
-            if s == "Done":
-                print(f"  {icon} {s:<14} {len(ids)}")
-            else:
-                print(f"  {icon} {s:<14} {len(ids)}  — {', '.join(ids)}")
-
-        # Active issues (non-Done, non-Backlog, non-Cancelled, tracked in map)
-        tracked = set(issue_map.values())
-        active = [i for i in issues if i["status"] not in ("Done", "Backlog", "Cancelled") and i["id"] in tracked]
-        if active:
-            print()
-            print("  Active tracked issues:")
-            for i in active:
-                key = next((k for k, v in issue_map.items() if v == i["id"]), i["id"])
-                print(f"    [{i['status']:<12}]  {key} — {i['title'][:40]}")
-
-    # ── Gate status ───────────────────────────────────────────────────────────
-    print(header("GATE STATUS"))
-    if issues:
-        g0_keys = ["G0-1", "G0-2", "G0-3", "G0-4"]
-        g0_done = all(status_of(k, issue_map, issues) == "Done" for k in g0_keys)
-        print(f"  Gate 0  {'✅ cleared' if g0_done else '🔴 not cleared'}")
-
-        d_keys = [f"D-{i:02d}" for i in range(1, 10)]
-        d_done = sum(1 for k in d_keys if status_of(k, issue_map, issues) == "Done")
-        print(f"  Gate 1  {d_done}/{len(d_keys)} designs done")
-
-        q7 = status_of("Q-07", issue_map, issues)
-        q7_label = "✅ passed" if q7 == "Done" else f"pending (Q-07 is {q7 or 'Backlog'})"
-        print(f"  Gate 2  {q7_label}")
-    else:
-        print("  (offline — run gate-watcher to refresh)")
+            print_sub_app_block(slug, cfg, issue_map, issues)
 
     # ── Pending agents ────────────────────────────────────────────────────────
     pending = pending_agents()
@@ -325,6 +372,7 @@ def main():
     print(rule("━"))
     gw = PROJECT_DIR / ".docs" / "gate-watcher.py"
     print(f"  Gate watcher : python3 {gw.relative_to(Path.home())}")
+    print(f"  All sub-apps : python3 {gw.relative_to(Path.home())} --all")
     print(rule("━"))
     print()
 
