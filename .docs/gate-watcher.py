@@ -1134,14 +1134,22 @@ def run_cycle():
             state["gate0_cleared"] = True
             actions += 1
 
-        # Spawn all 9 design agents in parallel — one per issue
-        for d_key, d_lid, d_screen, d_detail in DESIGN_ISSUES:
-            spawn_agent(
-                "design-agent",
-                f"gate0-design-{d_key.lower()}",
-                prompt_design(d_key, d_lid, d_screen, d_detail),
-                state,
-            )
+        # Spawn ONE design agent at a time — gate blocks if any D-XX is In Progress or In Review
+        _design_in_flight = [
+            (d_key, st(d_key)) for d_key, _, _, _ in DESIGN_ISSUES
+            if st(d_key) in ("In Progress", "In Review")
+        ]
+        if _design_in_flight:
+            for _key, _status in _design_in_flight:
+                log(f"  ⏸️  Design queue gated — {_key} is {_status}")
+        else:
+            for d_key, d_lid, d_screen, d_detail in DESIGN_ISSUES:
+                spawn_key = f"gate0-design-{d_key.lower()}"
+                if spawn_key not in state.get("spawned", []) and st(d_key) in ("Backlog", "Todo"):
+                    spawn_agent("design-agent", spawn_key,
+                                prompt_design(d_key, d_lid, d_screen, d_detail), state)
+                    actions += 1
+                    break  # one at a time — re-check next cycle
 
         # Spawn TL (infra) and QA framework setup in parallel with design
         spawn_agent("tl-agent",  "gate0-tl", prompt_tl_agent(),  state)
