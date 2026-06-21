@@ -1246,12 +1246,12 @@ def run_cycle():
     fe_b_issues = {k: tuple(v) for k, v in cfg.get("fe_b_issues", {}).items()}
 
     for key, (lid, desc, deps) in fe_a_issues.items():
-        if is_todo(key) and just_became(key, "Todo"):
+        if is_todo(key):
             spawn_agent("fe-a-agent", f"dev-{key.lower()}", prompt_fe_a(key, lid, desc, deps), state)
             actions += 1
 
     for key, (lid, desc, deps) in fe_b_issues.items():
-        if is_todo(key) and just_became(key, "Todo"):
+        if is_todo(key):
             spawn_agent("fe-b-agent", f"dev-{key.lower()}", prompt_fe_b(key, lid, desc, deps), state)
             actions += 1
 
@@ -1267,7 +1267,7 @@ def run_cycle():
     # Loaded from config: {"Q-02": ["CRE-46", "description", "feature_issues"], ...}
     qa_spawn = {k: tuple(v) for k, v in cfg.get("qa_spawn", {}).items()}
     for q_key, (lid, desc, feat) in qa_spawn.items():
-        if is_todo(q_key) and just_became(q_key, "Todo"):
+        if is_todo(q_key):
             spawn_agent("qa-agent", f"qa-{q_key.lower()}",
                         prompt_qa_test(q_key, lid, desc, feat), state)
             actions += 1
@@ -1283,7 +1283,7 @@ def run_cycle():
         set_status(m[regression_key], regression_key, "Todo", "All DEV issues done")
         actions += 1
 
-    if is_todo(regression_key) and just_became(regression_key, "Todo"):
+    if is_todo(regression_key):
         spawn_agent(
             "qa-agent", f"qa-{regression_key.lower()}",
             prompt_qa_test(
@@ -1300,7 +1300,7 @@ def run_cycle():
         set_status(m[staging_key], staging_key, "Todo", f"{regression_key} full regression passed")
         actions += 1
 
-    if is_todo(staging_key) and just_became(staging_key, "Todo"):
+    if is_todo(staging_key):
         spawn_agent(
             "tl-agent", f"dev-{staging_key.lower()}",
             f"""
