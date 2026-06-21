@@ -901,9 +901,14 @@ Design references (read before starting):
 Steps:
 1. Read the PRD sections relevant to this screen.
 2. Read DESIGN.md for the Mondrian neobrutalist style rules (palette, typography, borders, shadows).
-3. Use mcp__stitch__generate_screen_from_text to create screens at 390px (MOBILE), 768px (TABLET),
-   and 1280px (DESKTOP). Always pass designSystem: "assets/f7ec1a75b48d4b5985962fbe7074ce76".
-   For edits to existing screens, use mcp__stitch__edit_screens with model: "GEMINI_3_1_PRO".
+3. Call mcp__stitch__list_screens first. Filter for titles starting with "[{key}]". Parse the
+   normalized title format "[{key}] {{ScreenName}} — {{State}} — {{resolution}}px" to identify
+   which State+resolution combinations already exist. Only generate missing screens — skip existing ones.
+   Use mcp__stitch__generate_screen_from_text for new screens (always pass
+   designSystem: "assets/f7ec1a75b48d4b5985962fbe7074ce76") and title format
+   "[{key}] {{ScreenName}} — {{State}} — {{resolution}}px" (States: Initial, Error, Filled, Confirm,
+   Preview; Resolutions: 390px, 768px, 1280px). For edits to existing screens, use
+   mcp__stitch__edit_screens with model: "GEMINI_3_1_PRO".
 4. Move {linear_id} to 'In Review' with priority 2 (High) using mcp__linear-server__save_issue.
 5. Post a completion comment on {linear_id} using mcp__linear-server__save_comment following
    the In-Review comment template in your skill file (Screens delivered - v1 table only).
