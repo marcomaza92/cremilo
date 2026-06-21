@@ -56,6 +56,10 @@ Examples: `[D-12] Rates — Initial — 1280px`, `[D-12] Rates — Error — 390
 
 Post this when first delivering screens for a design issue. No rubric table, no checklists — only the screens table. The human will post `/promote` to generate the formal review checklist when satisfied.
 
+**URLs in the table must be Stitch web URLs** — never `lh3.googleusercontent.com` screenshot download URLs. Construct each URL from the screen's `name` field returned by `list_screens` or `generate_screen_from_text`:
+- `name` format: `"projects/9329790636631148728/screens/{screen_id}"`
+- URL to use: `https://stitch.withgoogle.com/projects/9329790636631148728?node-id={screen_id}`
+
 ```markdown
 ✅ Design submitted for review — {ISSUE-KEY}
 
@@ -63,9 +67,9 @@ Post this when first delivering screens for a design issue. No rubric table, no 
 
 | Resolution | Initial | Error replica | Filled replica |
 |---|---|---|---|
-| 390 (mobile) | {url} | {url or n/a} | {url or n/a} |
-| 768 (tablet) | {url} | {url or n/a} | {url or n/a} |
-| 1280 (desktop) | {url} | {url or n/a} | {url or n/a} |
+| 390 (mobile) | {stitch_url} | {stitch_url or n/a} | {stitch_url or n/a} |
+| 768 (tablet) | {stitch_url} | {stitch_url or n/a} | {stitch_url or n/a} |
+| 1280 (desktop) | {stitch_url} | {stitch_url or n/a} | {stitch_url or n/a} |
 
 ---
 👉 Reviewer: post `/redesign <prompt>` to refine screens, or `/promote` when satisfied to start formal review.
@@ -73,7 +77,7 @@ Post this when first delivering screens for a design issue. No rubric table, no 
 
 ## Redesign comment template (after /redesign command)
 
-When gate-watcher spawns you for a `/redesign` task, post this format after editing screens. Same as delivery — no checklists.
+When gate-watcher spawns you for a `/redesign` task, post this format after editing screens. Same as delivery — no checklists. Same Stitch URL rule applies: use `https://stitch.withgoogle.com/projects/9329790636631148728?node-id={screen_id}`, not screenshot URLs.
 
 ```markdown
 🔄 Screens redesigned — {ISSUE-KEY}
@@ -82,9 +86,9 @@ When gate-watcher spawns you for a `/redesign` task, post this format after edit
 
 | Resolution | Initial | Error replica | Filled replica |
 |---|---|---|---|
-| 390 (mobile) | {url} | {url or n/a} | {url or n/a} |
-| 768 (tablet) | {url} | {url or n/a} | {url or n/a} |
-| 1280 (desktop) | {url} | {url or n/a} | {url or n/a} |
+| 390 (mobile) | {stitch_url} | {stitch_url or n/a} | {stitch_url or n/a} |
+| 768 (tablet) | {stitch_url} | {stitch_url or n/a} | {stitch_url or n/a} |
+| 1280 (desktop) | {stitch_url} | {stitch_url or n/a} | {stitch_url or n/a} |
 
 ---
 👉 Reviewer: post `/redesign <prompt>` to refine further, or `/promote` when satisfied to start formal review.
@@ -95,6 +99,7 @@ If an edit did not persist (htmlCode.name unchanged after `get_screen` verify), 
 
 ## Stitch-specific operational rules
 
+- **Screen URLs in delivery comments must be Stitch web URLs**, not screenshot download URLs. After generating or editing a screen, extract the `screen_id` from the `name` field (`"projects/9329790636631148728/screens/{screen_id}"`) and construct: `https://stitch.withgoogle.com/projects/9329790636631148728?node-id={screen_id}`. Never use `screenshot.downloadUrl` (`lh3.googleusercontent.com`) in Linear comments or tables.
 - **Before generating any screen**, call `mcp__stitch__list_screens` for the Stitch project. Filter results for titles starting with `[D-XX]` (your current issue key). Parse the normalized title (`[D-XX] {ScreenName} — {State} — {resolution}px`) to identify which State+resolution combinations already exist. Only generate screens that are missing — skip any that already exist.
 - **`mcp__stitch__edit_screens` works with `GEMINI_3_1_PRO`** (verified 2026-06-08). Always pass `model: "GEMINI_3_1_PRO"` — never `GEMINI_3_PRO` (deprecated, silently fails).
 - **Verify edits via `get_screen`**: after calling `edit_screens`, call `get_screen` and confirm `htmlCode.name` changed from before. Screenshot URL may lag — do not use it as verification.
