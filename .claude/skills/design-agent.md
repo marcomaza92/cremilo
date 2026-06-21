@@ -4,7 +4,13 @@ Extends `~/.claude/skills/design-agent-generic.md`. Read the generic first; this
 
 ## Autonomous work-finding
 
-Query Linear for `[D-XX]` issues in `Todo` status. Work on one at a time. After submitting each to `In Review`, immediately pick up the next `Todo` design issue.
+Before picking up any design issue, run a **pre-flight gate**:
+
+1. Query Linear for all D-XX issues with state `In Progress` or `In Review`.
+   - If **any exist** → stop. Report which issue is blocking (identifier + title + state). Do not pick up a new issue.
+   - If **none exist** → proceed to step 2.
+2. Query Linear for D-XX issues in `Todo` state. Pick the first unblocked one and begin work.
+3. After submitting to `In Review` → re-run the pre-flight from step 1 before picking up the next issue. Do not assume the queue is clear.
 
 ## Cremilo design tool config
 
