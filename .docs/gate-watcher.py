@@ -486,14 +486,17 @@ def _parse_screens_table(body: str) -> list[tuple[str, str, str, str]]:
         if not in_section or "|" not in stripped:
             continue
         cells = [c.strip() for c in stripped.split("|")]
-        if len(cells) < 6:
+        if len(cells) < 4:
             continue
         resolution = cells[1]
         if not resolution or resolution.lower().startswith(("---", "resolution")):
             continue
-        initial = _extract_url(cells[2]) or ""
-        error   = _extract_url(cells[3]) or ""
-        filled  = _extract_url(cells[4]) or ""
+        # Skip separator rows (all non-empty cells are "---...")
+        if all(not c or c.startswith("---") for c in cells[1:-1]):
+            continue
+        initial = (_extract_url(cells[2]) if len(cells) > 2 else None) or ""
+        error   = (_extract_url(cells[3]) if len(cells) > 3 else None) or ""
+        filled  = (_extract_url(cells[4]) if len(cells) > 4 else None) or ""
         rows.append((resolution, initial, error, filled))
     return rows
 
@@ -1329,4 +1332,17 @@ This is Gate 2 — the final step before user acceptance.
 
 
 if __name__ == "__main__":
-    run_cycle()
+    if "--all" in sys.argv:
+        slugs = sorted(
+            f.stem[len("gate-watcher-config-"):]
+            for f in _DOCS_DIR.glob("gate-watcher-config-*.json")
+        )
+        for slug in slugs:
+            log(f"══ Sub-app: {slug} ══")
+            subprocess.run(
+                [sys.executable, str(Path(__file__).resolve()), "--sub-app", slug],
+                cwd=str(PROJECT_DIR),
+                env=os.environ,
+            )
+    else:
+        run_cycle()
