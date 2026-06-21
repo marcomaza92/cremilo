@@ -150,6 +150,11 @@ def parse_frontmatter(source) -> dict:
     cb = re.match(r"^```(?:yaml)?\n(---\n.*?\n---)\n```", text, re.DOTALL)
     if cb:
         text = cb.group(1) + text[cb.end():]
+    else:
+        # Raw YAML code block without --- delimiters (Linear's native format)
+        cb2 = re.match(r"^```(?:yaml)?\n(.*?)\n```", text, re.DOTALL)
+        if cb2:
+            text = "---\n" + cb2.group(1) + "\n---" + text[cb2.end():]
     m = re.match(r"^---\n(.*?)\n---", text, re.DOTALL)
     if not m:
         return {}
