@@ -701,9 +701,13 @@ Steps:
 
 | Resolution | Initial | Error replica | Filled replica |
 |---|---|---|---|
-| 390 (mobile) | {{updated url or same url if edit failed}} | {{url or n/a}} | {{url or n/a}} |
-| 768 (tablet) | {{updated url or same url if edit failed}} | {{url or n/a}} | {{url or n/a}} |
-| 1280 (desktop) | {{updated url or same url if edit failed}} | {{url or n/a}} | {{url or n/a}} |
+| 390 (mobile) | {{stitch_url or same stitch_url if edit failed}} | {{stitch_url or n/a}} | {{stitch_url or n/a}} |
+| 768 (tablet) | {{stitch_url or same stitch_url if edit failed}} | {{stitch_url or n/a}} | {{stitch_url or n/a}} |
+| 1280 (desktop) | {{stitch_url or same stitch_url if edit failed}} | {{stitch_url or n/a}} | {{stitch_url or n/a}} |
+
+Where stitch_url = https://stitch.withgoogle.com/projects/9329790636631148728?node-id={{screen_id}}
+and screen_id is the last path segment of the screen's `name` field from list_screens.
+Use Stitch web URLs only — never lh3.googleusercontent.com screenshot download URLs.
 
 If any screen did not update, append: ⚠️ {{resolution}} — edit did not persist; screen unchanged.
 
@@ -912,6 +916,11 @@ Steps:
 4. Move {linear_id} to 'In Review' with priority 2 (High) using mcp__linear-server__save_issue.
 5. Post a completion comment on {linear_id} using mcp__linear-server__save_comment following
    the In-Review comment template in your skill file (Screens delivered - v1 table only).
+   For each screen URL in the table, use the Stitch web URL — NOT the lh3.googleusercontent.com
+   screenshot download URL. Construct it from the screen's `name` field (returned by
+   list_screens or generate_screen_from_text):
+     name format:  "projects/9329790636631148728/screens/{{screen_id}}"
+     URL to use:   https://stitch.withgoogle.com/projects/9329790636631148728?node-id={{screen_id}}
 
 IMPORTANT:
 - This is your ONLY task — do not work on other design issues.
