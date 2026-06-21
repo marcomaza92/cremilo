@@ -29,7 +29,14 @@ Before picking up any design issue, run a **pre-flight gate**:
 
 ## Required resolutions per screen
 
-Generate at **390px (mobile)**, **768px (tablet)**, and **1280px (desktop)** using `deviceType: MOBILE`, `TABLET`, and `DESKTOP` respectively. Always prefix screen titles with `[D-XX]` and include the resolution, e.g. `[D-04] DataTable Tablet 768px`.
+Generate at **390px (mobile)**, **768px (tablet)**, and **1280px (desktop)** using `deviceType: MOBILE`, `TABLET`, and `DESKTOP` respectively.
+
+Screen title format (strict): `[D-XX] {ScreenName} — {State} — {resolution}px`
+- `{ScreenName}` matches the issue's screen title (e.g. `DataTable`, `Rates`)
+- `{State}` is one of: `Initial`, `Error`, `Filled`, `Confirm`, `Preview`
+- `{resolution}px` is `390px`, `768px`, or `1280px`
+
+Examples: `[D-12] Rates — Initial — 1280px`, `[D-12] Rates — Error — 390px`
 
 ## Predicate classification table
 
@@ -88,6 +95,7 @@ If an edit did not persist (htmlCode.name unchanged after `get_screen` verify), 
 
 ## Stitch-specific operational rules
 
+- **Before generating any screen**, call `mcp__stitch__list_screens` for the Stitch project. Filter results for titles starting with `[D-XX]` (your current issue key). Parse the normalized title (`[D-XX] {ScreenName} — {State} — {resolution}px`) to identify which State+resolution combinations already exist. Only generate screens that are missing — skip any that already exist.
 - **`mcp__stitch__edit_screens` works with `GEMINI_3_1_PRO`** (verified 2026-06-08). Always pass `model: "GEMINI_3_1_PRO"` — never `GEMINI_3_PRO` (deprecated, silently fails).
 - **Verify edits via `get_screen`**: after calling `edit_screens`, call `get_screen` and confirm `htmlCode.name` changed from before. Screenshot URL may lag — do not use it as verification.
 - **`mcp__stitch__*` deletion is unsupported via API.** Screens can only be deleted manually in the Stitch UI.
