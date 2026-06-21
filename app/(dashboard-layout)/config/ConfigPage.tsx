@@ -3,6 +3,8 @@
 import { Suspense } from "react";
 import { useConfigDeepLink } from "@/app/hooks/useConfigDeepLink";
 import RatesSection from "./RatesSection";
+import FormatSection from "./FormatSection";
+import GlobalCurrencySection from "./GlobalCurrencySection";
 import styles from "./page.module.css";
 
 function ConfigDeepLinkHandler() {
@@ -59,6 +61,28 @@ const ConfigPage = () => {
         </section>
 
         <section
+          id="config-section-format"
+          className={styles.page__section}
+          aria-labelledby="format-heading"
+        >
+          <h2 id="format-heading" className={styles.page__sectionTitle}>
+            FORMATO
+          </h2>
+          <FormatSection />
+        </section>
+
+        <section
+          id="config-section-global-currency"
+          className={styles.page__section}
+          aria-labelledby="global-currency-heading"
+        >
+          <h2 id="global-currency-heading" className={styles.page__sectionTitle}>
+            MONEDA GLOBAL
+          </h2>
+          <GlobalCurrencySection />
+        </section>
+
+        <section
           id="config-section-preferences"
           className={styles.page__section}
           aria-labelledby="preferences-heading"
@@ -66,7 +90,7 @@ const ConfigPage = () => {
           <h2 id="preferences-heading" className={styles.page__sectionTitle}>
             PREFERENCIAS
           </h2>
-          {/* DEV-18/DEV-25 will populate this section */}
+          {/* DEV-25 will populate this section */}
         </section>
       </main>
     </div>
