@@ -60,7 +60,7 @@
   color: var(--color-surface);
 }
 
-.currency__input {
+.currency__select {
   border: 2px solid var(--color-on-surface);
   background: var(--color-surface);
   color: var(--color-on-surface);
@@ -68,13 +68,20 @@
   font-size: 14px;
   font-family: var(--font-body);
   outline: none;
-  width: 160px;
+  min-width: 200px;
   min-height: 48px;
+  cursor: pointer;
 }
 
-.currency__input:focus {
+.currency__select:focus {
   outline: 2px solid var(--color-on-surface);
   outline-offset: 2px;
+}
+
+.currency__hint {
+  font-size: 13px;
+  color: var(--color-on-surface);
+  opacity: 0.6;
 }
 
 .currency__preview {
