@@ -470,6 +470,92 @@ def get_latest_slash_command(linear_id: str) -> tuple[str | None, str]:
         return None, ""
 
 
+def get_latest_fix_prompt(linear_id: str) -> str:
+    """
+    Return the fix prompt from the most recent '🔧 `/fix` received' comment on the issue,
+    or '' if none found. The GitHub workflow posts this comment when /fix is triggered on a PR.
+    """
+    try:
+        data = _gql("""
+            query($id: String!) {
+              issue(id: $id) {
+                comments { nodes { body createdAt } }
+              }
+            }
+        """, {"id": linear_id})
+        nodes = (data.get("data") or {}).get("issue", {}).get("comments", {}).get("nodes", [])
+        fix_comments = [
+            c for c in nodes
+            if "🔧 `/fix` received" in (c.get("body") or "")
+        ]
+        if not fix_comments:
+            return ""
+        latest = sorted(fix_comments, key=lambda x: x.get("createdAt", ""), reverse=True)[0]
+        body = (latest.get("body") or "")
+        # Body format: "🔧 `/fix` received — spawning agent\n\n{prompt}"
+        parts = body.split("\n\n", 1)
+        return parts[1].strip() if len(parts) > 1 else ""
+    except Exception as e:
+        log(f"  WARN: could not fetch fix prompt for {linear_id} — {e}")
+        return ""
+
+
+def handle_slash_fix(
+    dev_key: str, dev_lid: str, description: str, deps: str,
+    agent_type: str, state: dict,
+):
+    """
+    Triggered when a DEV issue moves In Review → In Progress (via GitHub /fix workflow).
+    Fetches the fix prompt from the latest Linear fix comment, then re-spawns the FE agent
+    with the original task context + the specific feedback to address.
+    """
+    fix_prompt = get_latest_fix_prompt(dev_lid)
+    if not fix_prompt:
+        log(f"  ⚠️  {dev_key} In Progress but no /fix comment found — skipping re-spawn")
+        return
+
+    fix_key = f"fix-{dev_key.lower()}-{datetime.now().strftime('%Y%m%d%H%M')}"
+
+    task_prompt = f"""
+Linear issue {dev_key} ({dev_lid}) was moved back to In Progress by a /fix command on GitHub.
+
+{dev_key}: {description}
+
+Project root: {PROJECT_DIR}
+PTS: {cfg["pts_url"]}
+DESIGN: {DESIGN_FILE}
+
+Dependencies already Done: {deps}
+
+## Feedback to address
+
+{fix_prompt}
+
+Read AGENTS.md and CLAUDE.md for full stack constraints.
+
+When done:
+1. Open a PR with a clear description. In the PR body, add on its own line:
+   Closes {dev_lid}
+2. Move {dev_lid} to **'In Review'** in Linear using mcp__linear-server__save_issue.
+3. Post a comment on {dev_lid} using mcp__linear-server__save_comment:
+   ```
+   👀 {agent_type.upper()} — {dev_key} re-submitted after fix
+
+   **What was addressed:** [brief description of changes made]
+   **PR:** [PR link]
+   **Depends on:** {deps}
+
+   ---
+   👉 TL: please review and merge the PR, then move to **Done**.
+   ```
+
+Do not merge your own PR.
+""".strip()
+
+    spawn_agent(agent_type, fix_key, task_prompt, state)
+    log(f"  🔧 {dev_key} /fix → re-spawned {agent_type} [{fix_key}]")
+
+
 def _parse_screens_table(body: str) -> list[tuple[str, str, str, str]]:
     """
     Parse the 'Screens delivered' table from a comment body.
@@ -1022,7 +1108,8 @@ Dependencies already Done: {deps}
 Read AGENTS.md and CLAUDE.md for full stack constraints.
 
 When done:
-1. Open a PR with a clear description.
+1. Open a PR with a clear description. In the PR body, add on its own line:
+   Closes {linear_id}
 2. Move {linear_id} to **'In Review'** in Linear using mcp__linear-server__save_issue.
 3. Post a comment on {linear_id} using mcp__linear-server__save_comment:
    ```
@@ -1055,7 +1142,8 @@ Dependencies already Done: {deps}
 Read AGENTS.md and CLAUDE.md for full stack constraints.
 
 When done:
-1. Open a PR with a clear description.
+1. Open a PR with a clear description. In the PR body, add on its own line:
+   Closes {linear_id}
 2. Move {linear_id} to **'In Review'** in Linear using mcp__linear-server__save_issue.
 3. Post a comment on {linear_id} using mcp__linear-server__save_comment:
    ```
@@ -1252,6 +1340,22 @@ def run_cycle():
             handle_slash_redesign(d_key, d_lid, d_screen, d_detail, args, state)
             actions += 1
 
+    # ── DEV In Review → In Progress (/fix workflow) → re-spawn FE agent ─────
+    fe_a_issues = {k: tuple(v) for k, v in cfg.get("fe_a_issues", {}).items()}
+    fe_b_issues = {k: tuple(v) for k, v in cfg.get("fe_b_issues", {}).items()}
+
+    for key, (lid, desc, deps) in fe_a_issues.items():
+        if state.get(key) == "In Review" and st(key) == "In Progress":
+            log(f"  🔧 {key}: In Review → In Progress detected — checking for /fix")
+            handle_slash_fix(key, lid, desc, deps, "fe-a-agent", state)
+            actions += 1
+
+    for key, (lid, desc, deps) in fe_b_issues.items():
+        if state.get(key) == "In Review" and st(key) == "In Progress":
+            log(f"  🔧 {key}: In Review → In Progress detected — checking for /fix")
+            handle_slash_fix(key, lid, desc, deps, "fe-b-agent", state)
+            actions += 1
+
     # ── Multi-dep unlocks → move to Todo ─────────────────────────────────────
     # Loaded from gate-watcher-config.json: [{"deps": ["DEV-04","DEV-05"], "unlocks": ["DEV-07","DEV-08"]}, ...]
     for rule in cfg.get("multi_dep_unlocks", []):
@@ -1264,9 +1368,6 @@ def run_cycle():
 
     # ── DEV issues Todo → spawn FE-A or FE-B ─────────────────────────────────
     # Loaded from gate-watcher-config.json: {"DEV-01": ["CRE-31", "description", "deps"], ...}
-    fe_a_issues = {k: tuple(v) for k, v in cfg.get("fe_a_issues", {}).items()}
-    fe_b_issues = {k: tuple(v) for k, v in cfg.get("fe_b_issues", {}).items()}
-
     for key, (lid, desc, deps) in fe_a_issues.items():
         if is_todo(key):
             spawn_agent("fe-a-agent", f"dev-{key.lower()}", prompt_fe_a(key, lid, desc, deps), state)

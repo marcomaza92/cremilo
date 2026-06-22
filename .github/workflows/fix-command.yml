@@ -1,0 +1,120 @@
+name: Fix command — queue agent for PR feedback
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  fix-on-command:
+    # Only PR comments whose body starts with /fix
+    if: >
+      github.event.issue.pull_request != null &&
+      startsWith(github.event.comment.body, '/fix')
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+      LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+    steps:
+      - name: Verify commenter has write permission
+        env:
+          ACTOR: ${{ github.event.comment.user.login }}
+        run: |
+          set -euo pipefail
+          perm=$(gh api "repos/${GH_REPO}/collaborators/$ACTOR/permission" --jq '.permission' 2>/dev/null || echo "none")
+          echo "User '$ACTOR' has repo permission: $perm"
+          case "$perm" in
+            admin|write) echo "Authorized." ;;
+            *)
+              echo "::error::User '$ACTOR' lacks permission (got: '$perm'); ignoring /fix."
+              exit 1
+              ;;
+          esac
+
+      - name: Reject empty /fix prompt
+        env:
+          BODY: ${{ github.event.comment.body }}
+          PR: ${{ github.event.issue.number }}
+        run: |
+          set -euo pipefail
+          stripped=$(echo "$BODY" | sed 's|^/fix||' | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//')
+          if [ -z "$stripped" ]; then
+            gh pr comment "$PR" --body "❌ \`/fix\` requires a prompt. Usage:
+          \`\`\`
+          /fix Your detailed feedback here.
+          \`\`\`"
+            echo "Empty prompt — exiting."
+            exit 1
+          fi
+          echo "PROMPT<<EOF" >> "$GITHUB_ENV"
+          echo "$stripped" >> "$GITHUB_ENV"
+          echo "EOF" >> "$GITHUB_ENV"
+
+      - name: Extract Linear issue identifier from PR branch or title
+        env:
+          PR: ${{ github.event.issue.number }}
+        run: |
+          set -euo pipefail
+          pr_json=$(gh api "repos/${GH_REPO}/pulls/$PR" --jq '{branch: .head.ref, title: .title}')
+          branch=$(echo "$pr_json" | python3 -c "import json,sys,re; d=json.load(sys.stdin); m=re.search(r'(CRE-\d+)', d['branch'], re.I) or re.search(r'(CRE-\d+)', d['title'], re.I); print(m.group(1).upper() if m else '')")
+          if [ -z "$branch" ]; then
+            gh pr comment "$PR" --body "❌ \`/fix\` could not find a Linear issue identifier (\`CRE-XX\`) in the PR branch name or title. Add one and retry."
+            exit 1
+          fi
+          echo "LINEAR_ID=$branch" >> "$GITHUB_ENV"
+          echo "Found Linear issue: $branch"
+
+      - name: Move Linear issue to In Progress + post fix prompt as comment
+        env:
+          PR: ${{ github.event.issue.number }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PYEOF'
+          import os, json, urllib.request
+
+          key   = os.environ["LINEAR_API_KEY"]
+          lid   = os.environ["LINEAR_ID"]
+          prompt = os.environ["PROMPT"]
+          url   = "https://api.linear.app/graphql"
+
+          def gql(query, variables=None):
+              payload = json.dumps({"query": query, "variables": variables or {}}).encode()
+              req = urllib.request.Request(url, data=payload,
+                  headers={"Authorization": key, "Content-Type": "application/json"})
+              with urllib.request.urlopen(req, timeout=20) as r:
+                  return json.loads(r.read())
+
+          # Resolve issue UUID + team ID
+          d = gql("{ issue(id: \"%s\") { id team { id states { nodes { id name } } } } }" % lid)
+          issue = d["data"]["issue"]
+          issue_uuid = issue["id"]
+          team_id = issue["team"]["id"]
+          states = issue["team"]["states"]["nodes"]
+          in_progress_id = next(s["id"] for s in states if s["name"] == "In Progress")
+
+          # Move to In Progress
+          gql("""
+            mutation($id: String!, $stateId: String!) {
+              issueUpdate(id: $id, input: { stateId: $stateId, priority: 2 }) { success }
+            }
+          """, {"id": issue_uuid, "stateId": in_progress_id})
+
+          # Post comment with fix prompt
+          body = f"🔧 `/fix` received — spawning agent\n\n{prompt}"
+          gql("""
+            mutation($issueId: String!, $body: String!) {
+              commentCreate(input: { issueId: $issueId, body: $body }) { success }
+            }
+          """, {"issueId": issue_uuid, "body": body})
+
+          print(f"Moved {lid} to In Progress and posted fix prompt.")
+          PYEOF
+
+      - name: Acknowledge on the PR
+        env:
+          PR: ${{ github.event.issue.number }}
+          ACTOR: ${{ github.event.comment.user.login }}
+        run: |
+          gh pr comment "$PR" --body "🔧 Fix queued for \`$LINEAR_ID\` — gate-watcher will spawn the agent on the next cycle."
