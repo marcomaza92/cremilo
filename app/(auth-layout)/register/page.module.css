@@ -1,14 +1,14 @@
 .card {
-  background: #ffffff;
-  border: 3px solid #111111;
-  box-shadow: 6px 6px 0px #111111;
+  background: var(--color-surface-container-lowest);
+  border: var(--border-width) solid var(--color-brand-black);
+  box-shadow: 6px 6px 0px var(--color-brand-black);
   width: 100%;
   max-width: 420px;
 }
 
 .card__stripe {
   height: 8px;
-  background: #f5c400;
+  background: var(--color-brand-yellow);
 }
 
 .card__body {
@@ -25,7 +25,7 @@
   line-height: 1;
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  color: #111111;
+  color: var(--color-brand-black);
   margin: 0;
 }
 
@@ -33,7 +33,7 @@
   font-family: var(--font-body), "Space Grotesk", sans-serif;
   font-size: 14px;
   font-weight: 500;
-  color: #111111;
+  color: var(--color-brand-black);
   margin: 0;
 }
 
@@ -41,12 +41,12 @@
   font-family: var(--font-body), "Space Grotesk", sans-serif;
   font-size: 14px;
   font-weight: 700;
-  color: #1d54c7;
+  color: var(--color-secondary);
   text-decoration: underline;
 }
 
 .card__link:hover {
-  color: #111111;
+  color: var(--color-brand-black);
 }
 
 .form {
@@ -66,7 +66,7 @@
   font-size: 14px;
   font-weight: 700;
   line-height: 1.2;
-  color: #111111;
+  color: var(--color-brand-black);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -75,9 +75,9 @@
   font-family: var(--font-body), "Space Grotesk", sans-serif;
   font-size: 16px;
   font-weight: 400;
-  color: #111111;
-  background: #ffffff;
-  border: 3px solid #111111;
+  color: var(--color-brand-black);
+  background: var(--color-surface-container-lowest);
+  border: var(--border-width) solid var(--color-brand-black);
   border-radius: 0;
   padding: 12px 14px;
   width: 100%;
@@ -88,13 +88,13 @@
 }
 
 .form__input:focus {
-  background: #f6f3f2;
-  outline: 4px solid #111111;
+  background: var(--color-surface-container-low);
+  outline: 4px solid var(--color-brand-black);
   outline-offset: 0;
 }
 
 .form__input::placeholder {
-  color: #906f6b;
+  color: var(--color-outline);
 }
 
 .form__submit {
@@ -103,11 +103,11 @@
   font-weight: 400;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #ffffff;
-  background: #1d54c7;
-  border: 3px solid #111111;
+  color: var(--color-on-secondary);
+  background: var(--color-secondary);
+  border: var(--border-width) solid var(--color-brand-black);
   border-radius: 0;
-  box-shadow: 6px 6px 0px #111111;
+  box-shadow: 6px 6px 0px var(--color-brand-black);
   padding: 14px 24px;
   width: 100%;
   min-height: 48px;
@@ -117,11 +117,11 @@
 }
 
 .form__submit:hover {
-  background: #3f6ee1;
+  background: var(--color-secondary-container);
 }
 
 .form__submit:active {
-  box-shadow: 0px 0px 0px #111111;
+  box-shadow: 0px 0px 0px var(--color-brand-black);
   transform: translate(6px, 6px);
 }
 
@@ -129,15 +129,15 @@
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  background: #ffdad6;
-  border: 3px solid #ba1a1a;
+  background: var(--color-error-container);
+  border: var(--border-width) solid var(--color-error);
   padding: 12px 14px;
 }
 
 .error__icon {
   font-family: var(--font-headline), "Bebas Neue", sans-serif;
   font-size: 20px;
-  color: #93000a;
+  color: var(--color-on-error-container);
   line-height: 1;
   flex-shrink: 0;
   margin-top: 1px;
@@ -147,6 +147,6 @@
   font-family: var(--font-body), "Space Grotesk", sans-serif;
   font-size: 14px;
   font-weight: 500;
-  color: #93000a;
+  color: var(--color-on-error-container);
   margin: 0;
 }

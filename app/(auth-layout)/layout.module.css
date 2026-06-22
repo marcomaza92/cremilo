@@ -1,6 +1,6 @@
 .shell {
   min-height: 100dvh;
-  background: #fcf9f8;
+  background: var(--color-background);
   display: flex;
   flex-direction: column;
 }
@@ -10,8 +10,8 @@
   height: 64px;
   display: flex;
   align-items: center;
-  border-bottom: 3px solid #111111;
-  background: #ffffff;
+  border-bottom: var(--border-width) solid var(--color-brand-black);
+  background: var(--color-surface-container-lowest);
   flex-shrink: 0;
 }
 
@@ -21,12 +21,12 @@
   font-weight: 400;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #111111;
+  color: var(--color-brand-black);
   text-decoration: none;
 }
 
 .header__brand:hover {
-  color: #b20112;
+  color: var(--color-primary);
 }
 
 .main {
