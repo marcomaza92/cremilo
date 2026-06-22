@@ -458,7 +458,7 @@ def get_latest_slash_command(linear_id: str) -> tuple[str | None, str]:
             return None, ""
         latest = sorted(nodes, key=lambda x: x.get("createdAt", ""), reverse=True)[0]
         body = (latest.get("body") or "").strip()
-        for cmd in ("approve", "promote", "redesign"):
+        for cmd in ("approve", "promote", "redesign", "refresh"):
             prefix = f"/{cmd}"
             if body == prefix:
                 return cmd, ""
@@ -810,6 +810,47 @@ CRITICAL:
 
     spawn_agent("design-agent", redesign_key, task_prompt, state)
     log(f"  🔄 {d_key} /redesign → spawned design-agent [{redesign_key}] for v{next_version}")
+
+
+def handle_slash_refresh(d_key: str, d_lid: str, state: dict):
+    """/refresh: spawn design-agent to re-read current Stitch screens and post
+    an updated delivery comment. No screen regeneration, no status change."""
+    refresh_key = f"slash-refresh-{d_key.lower()}-{datetime.now().strftime('%Y%m%d%H%M')}"
+    task_prompt = f"""You are handling a /refresh command for design issue {d_key} ({d_lid}).
+
+A human reviewer has posted /refresh on this Linear issue. They may have deleted duplicate
+or unwanted screens in Stitch and want the delivery comment updated to reflect the current state.
+
+Your task:
+1. Call mcp__stitch__list_screens for project 9329790636631148728.
+2. Filter for screens whose title starts with [{d_key}].
+3. For each resolution (390px, 768px, 1280px), identify the canonical screen. If multiple screens
+   exist for the same resolution, use the last one in the list.
+4. Construct Stitch web URLs: https://stitch.withgoogle.com/projects/9329790636631148728?node-id={{screen_id}}
+   (extract screen_id from the name field: "projects/9329790636631148728/screens/{{screen_id}}")
+5. Read prior comments on {d_lid} to determine the current version number (vN). Increment by 1.
+6. Post an updated delivery comment on {d_lid} using mcp__linear-server__save_comment:
+
+🔄 Screens refreshed — {d_key}
+
+### Screens delivered - v{{N}}
+
+| Resolution | {{State}} |
+|---|---|
+| 390 (mobile) | {{stitch_url or n/a}} |
+| 768 (tablet) | {{stitch_url or n/a}} |
+| 1280 (desktop) | {{stitch_url or n/a}} |
+
+---
+👉 Reviewer: post `/redesign <prompt>` to refine screens, or `/promote` when satisfied to start formal review.
+
+Hard constraints:
+- Do NOT change issue status — leave it In Review.
+- Screen URLs must be stitch.withgoogle.com URLs, never lh3.googleusercontent.com.
+- Do not attach URLs to the Linear issue.
+"""
+    spawn_agent("design-agent", refresh_key, task_prompt, state)
+    log(f"  🔄 {d_key} /refresh → spawned design-agent [{refresh_key}]")
 
 
 def _is_pending_in_queue(spawn_key: str) -> bool:
@@ -1338,6 +1379,10 @@ def run_cycle():
         elif cmd == "redesign":
             log(f"  🎯 {d_key}: /redesign detected")
             handle_slash_redesign(d_key, d_lid, d_screen, d_detail, args, state)
+            actions += 1
+        elif cmd == "refresh":
+            log(f"  🎯 {d_key}: /refresh detected")
+            handle_slash_refresh(d_key, d_lid, state)
             actions += 1
 
     # ── DEV In Review → In Progress (/fix workflow) → re-spawn FE agent ─────

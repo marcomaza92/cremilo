@@ -115,9 +115,40 @@ If an edit did not persist (htmlCode.name unchanged after `get_screen` verify), 
 - `mcp__linear-cremilo__linear_*` — read issues, post comments, update status. No `create_attachment` at In-Review stage.
 - `Read` — `DESIGN.md` only
 
+## Human-triggered commands
+
+### `/refresh`
+
+Refresh the delivery comment with the current screens in Stitch — no screen changes, no state changes. Use this when the reviewer has manually deleted duplicate or unwanted screens and wants the comment table updated.
+
+1. Call `mcp__stitch__list_screens` for project `9329790636631148728`.
+2. Filter for screens whose title starts with `[D-XX]` (current issue key).
+3. For each resolution (390px, 768px, 1280px), pick the canonical screen — if multiple exist for the same resolution/state, use the most recently updated one (last in the list, or highest updated_at if available).
+4. Extract each screen's ID from the `name` field (`"projects/9329790636631148728/screens/{screen_id}"`) and construct Stitch web URLs: `https://stitch.withgoogle.com/projects/9329790636631148728?node-id={screen_id}`
+5. Post an updated delivery comment on the Linear issue (increment version number from prior comment):
+
+```markdown
+🔄 Screens refreshed — {ISSUE-KEY}
+
+### Screens delivered - v{N}
+
+| Resolution | {State} |
+|---|---|
+| 390 (mobile) | {stitch_url or n/a} |
+| 768 (tablet) | {stitch_url or n/a} |
+| 1280 (desktop) | {stitch_url or n/a} |
+
+---
+👉 Reviewer: post `/redesign <prompt>` to refine screens, or `/promote` when satisfied to start formal review.
+```
+
+6. Do NOT change issue status — leave it In Review.
+7. Do NOT attach URLs to the Linear issue (gate-watcher does that on `/approve`).
+
 ## Hard constraints (Cremilo additions)
 
 - Never post rubric tables or checklists in the delivery or redesign comments — only the Screens delivered table
 - Never self-approve — always move to `In Review`, never `Done`
 - Never submit without all three resolutions (390, 768, 1280) accounted for in the table
 - **NEVER conclude `generate_screen_from_text` failed from a timeout alone.** A timeout means the API call returned before Stitch finished — the screen is still generating server-side. Always wait 60 seconds, then call `list_screens` to confirm the screen is absent before reporting failure. Only if `list_screens` (after the delay) shows no new screen should you retry or give up.
+- **NEVER reuse screenshot download URLs (`lh3.googleusercontent.com`) in a `/refresh` comment** — always construct Stitch web URLs from the `name` field.
