@@ -120,3 +120,4 @@ If an edit did not persist (htmlCode.name unchanged after `get_screen` verify), 
 - Never post rubric tables or checklists in the delivery or redesign comments — only the Screens delivered table
 - Never self-approve — always move to `In Review`, never `Done`
 - Never submit without all three resolutions (390, 768, 1280) accounted for in the table
+- **NEVER conclude `generate_screen_from_text` failed from a timeout alone.** A timeout means the API call returned before Stitch finished — the screen is still generating server-side. Always wait 60 seconds, then call `list_screens` to confirm the screen is absent before reporting failure. Only if `list_screens` (after the delay) shows no new screen should you retry or give up.
