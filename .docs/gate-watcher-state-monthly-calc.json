@@ -33,6 +33,9 @@
   "DEV-13": "Backlog",
   "DEV-14": "Done",
   "DEV-15": "Done",
+  "DEV-16": "Backlog",
+  "DEV-17": "Backlog",
+  "D-10": "Backlog",
   "Q-01": "Done",
   "Q-02": "Done",
   "Q-03": "Done",
@@ -40,6 +43,8 @@
   "Q-05": "Backlog",
   "Q-06": "Backlog",
   "Q-07": "Backlog",
+  "Q-08": "Backlog",
+  "BUG-0005": "Backlog",
   "gate0_cleared": true,
   "spawned": [
     "gate0-design-d-07",
