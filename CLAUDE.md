@@ -71,6 +71,17 @@ Cremilo is a multi-app finance *suite* (Monthly Calculator + Credit Cards + Inve
 
 **The [Annoy Log](https://linear.app/cremilo/document/annoy-log-1d283e89442d) is for *pipeline annoyances***, not for feature requests against the app. Don't conflate.
 
+## Pipeline operations
+
+**Adding a new D-XX issue:** update all three local files or the gate-watcher will silently ignore the issue:
+1. `gate-watcher-config-<sub-app>.json` — add entry to `design_issues` array
+2. `gate-watcher-map-<sub-app>.json` — add `"D-XX": "CRE-XX"` key→Linear ID mapping
+3. `gate-watcher-state-<sub-app>.json` — add `"D-XX": "Backlog"` (or actual current status)
+
+Missing any one of the three makes `st("D-XX")` return `None`, causing the slash command loop to skip the issue entirely.
+
+**Gate-watcher requires `--sub-app` flag** to target the right sub-app: `python3 .docs/gate-watcher.py --sub-app monthly-calc`. Running without the flag defaults to the Config sub-app.
+
 ## What this session should and shouldn't do
 
 - ✅ Ship the active phase milestone (see `next_action` in [Roadmap](https://linear.app/cremilo/document/roadmap-6012a41bde5e) frontmatter, or run `python3 .docs/session-start.py`).
