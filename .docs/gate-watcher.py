@@ -813,41 +813,55 @@ CRITICAL:
 
 
 def handle_slash_refresh(d_key: str, d_lid: str, state: dict):
-    """/refresh: spawn design-agent to re-read current Stitch screens and post
-    an updated delivery comment. No screen regeneration, no status change."""
+    """/refresh: spawn design-agent to check if current Stitch screens differ from
+    the last delivery comment. Only reposts if stale. No screen regeneration, no status change."""
     refresh_key = f"slash-refresh-{d_key.lower()}-{datetime.now().strftime('%Y%m%d%H%M')}"
     task_prompt = f"""You are handling a /refresh command for design issue {d_key} ({d_lid}).
 
-A human reviewer has posted /refresh on this Linear issue. They may have deleted duplicate
-or unwanted screens in Stitch and want the delivery comment updated to reflect the current state.
+A human reviewer has posted /refresh on this Linear issue. Check whether the last delivery
+comment is already in sync with the current Stitch screens before posting anything new.
 
 Your task:
 1. Call mcp__stitch__list_screens for project 9329790636631148728.
 2. Filter for screens whose title starts with [{d_key}].
 3. For each resolution (390px, 768px, 1280px), identify the canonical screen. If multiple screens
    exist for the same resolution, use the last one in the list.
-4. Construct Stitch web URLs: https://stitch.withgoogle.com/projects/9329790636631148728?node-id={{screen_id}}
+4. Construct current Stitch web URLs: https://stitch.withgoogle.com/projects/9329790636631148728?node-id={{screen_id}}
    (extract screen_id from the name field: "projects/9329790636631148728/screens/{{screen_id}}")
-5. Read prior comments on {d_lid} to determine the current version number (vN). Increment by 1.
-6. Post an updated delivery comment on {d_lid} using mcp__linear-server__save_comment:
+   Collect the current screen_ids as a set.
+5. Read prior comments on {d_lid}. Find the most recent comment whose body contains
+   "Screens delivered - v". Extract all node-id= query param values from stitch.withgoogle.com
+   URLs in that comment. This is the previous screen_ids set.
+   Also note the current version number (vN) from that comment title.
+
+6. Compare current screen_ids set with previous screen_ids set:
+
+   IF IDENTICAL (same screen_ids, same count):
+   - Post a brief comment on {d_lid}: "✅ Screens are in sync — no update needed."
+   - Stop. Do not post a new delivery comment.
+
+   IF DIFFERENT (screens added, removed, or replaced):
+   - Increment vN by 1.
+   - Post an updated delivery comment on {d_lid} using mcp__linear-server__save_comment:
 
 🔄 Screens refreshed — {d_key}
 
 ### Screens delivered - v{{N}}
 
-| Resolution | {{State}} |
-|---|---|
-| 390 (mobile) | {{stitch_url or n/a}} |
-| 768 (tablet) | {{stitch_url or n/a}} |
-| 1280 (desktop) | {{stitch_url or n/a}} |
+| Resolution | Initial | Error replica | Filled replica |
+|---|---|---|---|
+| 390 (mobile) | {{stitch_url or n/a}} | {{stitch_url or n/a}} | {{stitch_url or n/a}} |
+| 768 (tablet) | {{stitch_url or n/a}} | {{stitch_url or n/a}} | {{stitch_url or n/a}} |
+| 1280 (desktop) | {{stitch_url or n/a}} | {{stitch_url or n/a}} | {{stitch_url or n/a}} |
 
 ---
-👉 Reviewer: post `/redesign <prompt>` to refine screens, or `/promote` when satisfied to start formal review.
+👉 Post `/redesign <prompt>` to iterate, `/promote` to start formal review, or `/refresh` to re-check.
 
 Hard constraints:
 - Do NOT change issue status — leave it In Review.
 - Screen URLs must be stitch.withgoogle.com URLs, never lh3.googleusercontent.com.
 - Do not attach URLs to the Linear issue.
+- Never post a new delivery comment if screens are already in sync.
 """
     spawn_agent("design-agent", refresh_key, task_prompt, state)
     log(f"  🔄 {d_key} /refresh → spawned design-agent [{refresh_key}]")
