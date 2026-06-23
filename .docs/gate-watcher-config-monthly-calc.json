@@ -11,7 +11,9 @@
     ["D-08", "CRE-28", "Config screen — Format section",
      "Format sub-section below Rates. Options: decimal separator (. or ,), currency symbol position (prefix/suffix), date format (DD/MM/YYYY or MM/DD/YYYY). Toggle or select controls, consistent with the design system."],
     ["D-09", "CRE-29", "Config screen — Impuesto de Sellos section",
-     "Toggle to enable/disable the 1.49% Impuesto de Sellos tax. When enabled: show calculated tax amount on applicable transactions. Explanatory label below the toggle."]
+     "Toggle to enable/disable the 1.49% Impuesto de Sellos tax. When enabled: show calculated tax amount on applicable transactions. Explanatory label below the toggle."],
+    ["D-10", "CRE-56", "Mobile/tablet nav drawer state",
+     "Open drawer state triggered by the hamburger icon at mobile + tablet breakpoints. Mobile (<820px): full-screen overlay with nav items + logout. Tablet (820–1199px): side-panel slide-in extending the 64px icon rail with full labels."]
   ],
 
   "design_dev_map": {
